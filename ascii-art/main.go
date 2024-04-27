@@ -4,44 +4,41 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	utils "ascii/utils"
 )
 
 func main() {
-	// reading into the file
+	// checks if there input provived
+	if len(os.Args) < 2 {
+		fmt.Println("Please provide text to display.")
+		return
+	}
+	// reads contents of the provided
 	content, err := os.ReadFile("standard.txt")
 	if err != nil {
 		panic(err)
 	}
-	// store content into a slice of strings
-	contentslice := strings.Split(string(content), "\n")
-	word := ""
-	stringslice := os.Args[1:]
-	if len(stringslice) == 1 {
-		word = stringslice[0]
-		if word == "" {
-			return
-		}
-		if word == "\\n" {
-			fmt.Println()
-			return
-		}
-	} else {
-		word = strings.Join(stringslice, " ")
+	// splits the content of the file into lines
+	contentLines := strings.Split(string(content), "\n")
+	// concatenates command-line arguments into a singe string
+	word := strings.Join(os.Args[1:], " ")
+	if word == "\\n" {
+		fmt.Println()
+		return
 	}
+	// Replace occurrences of "\t" with spaces
+	word = strings.ReplaceAll(word, "\\t", "    ")
 
+	// Split the input string by "\n" to separate words
 	words := strings.Split(word, "\\n")
 
+	// looping through each word
 	for _, input := range words {
 		if input == "" {
-			fmt.Println()
+			return
 		} else {
-			linesOfSlice := make([]string, 9)
-			for _, v := range input {
-				for i := 1; i <= 9; i++ {
-					linesOfSlice[i-1] += contentslice[int(v-32)*9+i]
-				}
-			}
-			fmt.Print(strings.Join(linesOfSlice, "\n"))
+			utils.PrintWord(input, contentLines)
 		}
 	}
 }
