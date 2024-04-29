@@ -14,4 +14,5 @@ func PrintWord(word string, contentLines []string) {
 		}
 	}
 	fmt.Print(strings.Join(linesOfSlice, "\n"))
+
 }

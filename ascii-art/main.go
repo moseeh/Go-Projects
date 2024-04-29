@@ -1,11 +1,10 @@
 package main
 
 import (
+	"ascii-art/utils"
 	"fmt"
 	"os"
 	"strings"
-
-	utils "ascii/utils"
 )
 
 func main() {
@@ -17,28 +16,14 @@ func main() {
 	// reads contents of the provided
 	content, err := os.ReadFile("standard.txt")
 	if err != nil {
-		panic(err)
-	}
-	// splits the content of the file into lines
-	contentLines := strings.Split(string(content), "\n")
-	// concatenates command-line arguments into a singe string
-	word := strings.Join(os.Args[1:], " ")
-	if word == "\\n" {
-		fmt.Println()
+		fmt.Println("invalid text file")
 		return
 	}
-	// Replace occurrences of "\t" with spaces
-	word = strings.ReplaceAll(word, "\\t", "    ")
-
-	// Split the input string by "\n" to separate words
-	words := strings.Split(word, "\\n")
-
-	// looping through each word
-	for _, input := range words {
-		if input == "" {
-			return
-		} else {
-			utils.PrintWord(input, contentLines)
-		}
+	contentLines := strings.Split(string(content), "\n")
+	if len(contentLines) != 856 {
+		fmt.Println("invalid text file")
+		return
 	}
+
+	utils.DisplayText(strings.Join(os.Args[1:], " "), contentLines)
 }
