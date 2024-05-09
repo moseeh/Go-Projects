@@ -19,11 +19,11 @@ func main() {
 		fmt.Println("invalid text file")
 		return
 	}
-	contentLines := strings.Split(string(content), "\n")
+	contentLines := utils.SplitFile(string(content))
+	// checks if the file provided contains 856 lines
 	if len(contentLines) != 856 {
 		fmt.Println("invalid text file")
 		return
 	}
-
 	utils.DisplayText(strings.Join(os.Args[1:], " "), contentLines)
 }

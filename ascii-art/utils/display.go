@@ -13,9 +13,9 @@ func DisplayText(input string, contentLines []string) {
 		fmt.Println()
 		return
 	}
-
 	input = strings.ReplaceAll(input, "\n", "\\n")
 	input = strings.ReplaceAll(input, "\\t", "    ")
+	// split the input string with the "\\n" into a slice strings
 	wordslice := strings.Split(input, "\\n")
 
 	for _, word := range wordslice {
@@ -26,7 +26,6 @@ func DisplayText(input string, contentLines []string) {
 				PrintWord(word, contentLines)
 			} else {
 				fmt.Println("Invalid input:", word)
-				// Optionally continue processing other words
 			}
 		}
 	}
