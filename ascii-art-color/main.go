@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"color/utils"
 	"fmt"
 	"os"
@@ -8,8 +9,9 @@ import (
 
 func main() {
 	//check enough command line arguments
-	if len(os.Args[1:]) < 1 || len(os.Args[1:]) > 3 {
-		fmt.Println("Usage: go run . [OPTION] [STRING]")
+	if len(os.Args[1:]) < 1 || len(os.Args[1:]) > 3 || !strings.HasPrefix(os.Args[1], "--color="){
+		fmt.Print("Usage: go run . [OPTION] [STRING]\n\n")
+		fmt.Println("EX: go run . --color=<color> <letters to be colored> \"something\"")
 		return
 	}
 	inputslice := utils.ParseFlags()
