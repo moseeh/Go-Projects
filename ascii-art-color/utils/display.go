@@ -5,7 +5,16 @@ import (
 	"strings"
 )
 
-func DisplayText(color string, input string, contentLines []string) {
+func DisplayText(color string, inputslice []string, contentLines []string) {
+	tobecolored := ""
+	input := ""
+	if len(inputslice) == 2 {
+		tobecolored = inputslice[0]
+		input = inputslice[1]
+	} else {
+		tobecolored = inputslice[0]
+		input = inputslice[0]
+	}
 	if input == "" {
 		return
 	}
@@ -23,7 +32,7 @@ func DisplayText(color string, input string, contentLines []string) {
 			fmt.Println()
 		} else {
 			if IsEnglish(word) {
-				PrintWord(color, word, contentLines)
+				PrintWord(color, word,tobecolored, contentLines)
 			} else {
 				fmt.Println("Invalid input:", word)
 			}

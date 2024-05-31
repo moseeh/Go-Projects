@@ -7,12 +7,13 @@ import (
 )
 
 func main() {
-	// check enough command line arguments
-	if len(os.Args) < 2 || len(os.Args) > 3 {
+	//check enough command line arguments
+	if len(os.Args[1:]) < 1 || len(os.Args[1:]) > 3 {
 		fmt.Println("Usage: go run . [OPTION] [STRING]")
 		return
 	}
-	color, input := utils.ParseArguments(os.Args[1:])
+	inputslice := utils.ParseFlags()
+	color := *utils.ColorPtr
 	// reads contents of the provided
 	content, err := os.ReadFile("standard.txt")
 	if err != nil {
@@ -25,5 +26,5 @@ func main() {
 		fmt.Println("invalid text file")
 		return
 	}
-	utils.DisplayText(color, input, contentLines)
+	utils.DisplayText(color, inputslice, contentLines)
 }
