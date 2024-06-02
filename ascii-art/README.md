@@ -32,7 +32,7 @@ $ go run . "string1" "string2" "string3" "string4"
 ## Installation 
 - clone the repository and cd into it
 ``` bash 
-git clone https://learn.zone01kisumu.ke/git/antmusumba/ascii-art
+git clone https://github.com/moseeh/Go-Projects
 cd ascii art 
 go run . "input your string or strings"
 
