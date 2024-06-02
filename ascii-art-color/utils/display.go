@@ -24,6 +24,8 @@ func DisplayText(color string, inputslice []string, contentLines []string) {
 	}
 	input = strings.ReplaceAll(input, "\n", "\\n")
 	input = strings.ReplaceAll(input, "\\t", "    ")
+	tobecolored = strings.ReplaceAll(tobecolored, "\n", "\\n")
+	tobecolored = strings.ReplaceAll(tobecolored, "\\t", "    ")
 	// split the input string with the "\\n" into a slice strings
 	wordslice := strings.Split(input, "\\n")
 
@@ -32,7 +34,7 @@ func DisplayText(color string, inputslice []string, contentLines []string) {
 			fmt.Println()
 		} else {
 			if IsEnglish(word) {
-				PrintWord(color, word,tobecolored, contentLines)
+				PrintWord(color, word, tobecolored, contentLines)
 			} else {
 				fmt.Println("Invalid input:", word)
 			}
