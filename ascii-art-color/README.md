@@ -36,3 +36,19 @@ go run . "hello there"
 ```sh
 go run . --color=<color> <enter your string here>
 ```
+
+## Installation 
+- clone the repository and cd into it
+``` bash 
+git clone https://github.com/moseeh/Go-Projects
+cd ascii art 
+go run . "input your string or strings"
+
+
+```
+
+## Banner files
+Banner files with specific graphical template representations using ASCII will be provided
+- standard.txt
+- shadow.txt
+- thinkertoy.txt
