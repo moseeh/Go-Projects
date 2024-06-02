@@ -1,15 +1,15 @@
 package main
 
 import (
-	"strings"
 	"color/utils"
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
 	//check enough command line arguments
-	if len(os.Args[1:]) < 1 || len(os.Args[1:]) > 3 || !strings.HasPrefix(os.Args[1], "--color="){
+	if len(os.Args[1:]) < 1 || len(os.Args[1:]) > 3 || (!strings.HasPrefix(os.Args[1], "--color=") && len(os.Args[1:]) != 1) || (strings.HasPrefix(os.Args[1], "--color=") && len(os.Args[1:]) == 1) {
 		fmt.Print("Usage: go run . [OPTION] [STRING]\n\n")
 		fmt.Println("EX: go run . --color=<color> <letters to be colored> \"something\"")
 		return
