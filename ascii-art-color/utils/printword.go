@@ -7,6 +7,18 @@ import (
 
 // printWord prints a word using predefined lines from the content file
 func PrintWord(color string, word string, tobecolored string, contentLines []string) {
+
+	if tobecolored == "" {
+		// If the substring to be colored is empty, just print the word without coloring
+		linesOfSlice := make([]string, 8)
+		for _, v := range word {
+			for i := 1; i < 9; i++ {
+				linesOfSlice[i-1] += contentLines[int(v-32)*9+i]
+			}
+		}
+		fmt.Println(strings.Join(linesOfSlice, "\n"))
+		return
+	}
 	linesOfSlice := make([]string, 8)
 	start := 0
 
