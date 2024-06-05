@@ -1,6 +1,9 @@
 package utils
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 func FindColor(s string) ([3]int, error) {
 
@@ -94,6 +97,19 @@ func FindColor(s string) ([3]int, error) {
 		"peru":            {205, 133, 63},
 		"goldenrod":       {218, 165, 32},
 		"darkgoldenrod":   {184, 134, 11},
+	}
+
+	if strings.HasPrefix(s, "#") {
+		return HexToRGB(s)
+	}
+	// Check if the input is an rgb color
+	if strings.HasPrefix(s, "rgb(") {
+		return RGBStringToRGB(s)
+	}
+
+	// Check if the input is an hsl color
+	if strings.HasPrefix(s, "hsl(") {
+		return HSLStringToRGB(s)
 	}
 
 	val, found := rgbColors[s]
