@@ -29,9 +29,9 @@ func main() {
 		fmt.Println("invalid text file")
 		return
 	}
-	_, errcolor := utils.FindColor(color)
+	_, errcolor := utils.FindColor(strings.ToLower(color))
 	if errcolor != nil {
-		fmt.Println(errcolor , color)
+		fmt.Println(errcolor, color)
 		return
 	}
 	utils.DisplayText(color, inputslice, contentLines)

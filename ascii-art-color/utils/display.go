@@ -42,7 +42,6 @@ func DisplayText(color string, inputslice []string, contentLines []string) {
 					tobecolored = ""
 					PrintWord(color, word, tobecolored, contentLines)
 				}
-
 				if len(tbcsplit) == 1 {
 					PrintWord(color, word, tobecolored, contentLines)
 				}
