@@ -28,13 +28,24 @@ func DisplayText(color string, inputslice []string, contentLines []string) {
 	tobecolored = strings.ReplaceAll(tobecolored, "\\t", "    ")
 	// split the input string with the "\\n" into a slice strings
 	wordslice := strings.Split(input, "\\n")
+	tbcsplit := strings.Split(tobecolored, "\\n")
 
-	for _, word := range wordslice {
+	for i, word := range wordslice {
 		if word == "" {
 			fmt.Println()
 		} else {
 			if IsEnglish(word) {
-				PrintWord(color, word, tobecolored, contentLines)
+				if i < len(tbcsplit) && len(tbcsplit) > 1 {
+					PrintWord(color, word, tbcsplit[i], contentLines)
+				}
+				if i >= len(tbcsplit) && len(tbcsplit) > 1 {
+					tobecolored = ""
+					PrintWord(color, word, tobecolored, contentLines)
+				}
+
+				if len(tbcsplit) == 1 {
+					PrintWord(color, word, tobecolored, contentLines)
+				}
 			} else {
 				fmt.Println("Invalid input:", word)
 			}
