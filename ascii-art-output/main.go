@@ -13,6 +13,8 @@ func main() {
 		fmt.Println("Please provide text to display.")
 		return
 	}
+
+	
 	// reads contents of the provided
 	content, err := os.ReadFile("standard.txt")
 	if err != nil {
