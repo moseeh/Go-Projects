@@ -6,11 +6,12 @@ import (
 )
 
 func DisplayText(input string, banner string, contentLines []string) {
+	s := ""
 	if input == "" {
 		return
 	}
 	if input == "\\n" || input == "\n" {
-		fmt.Println()
+		s += "\n"
 		return
 	}
 	input = strings.ReplaceAll(input, "\n", "\\n")
@@ -20,13 +21,14 @@ func DisplayText(input string, banner string, contentLines []string) {
 
 	for _, word := range wordslice {
 		if word == "" {
-			fmt.Println()
+			s += "\n"
 		} else {
 			if IsEnglish(word) {
-				PrintWord(word, banner, contentLines)
+				s += PrintWord(word, banner, contentLines)
 			} else {
 				fmt.Println("Invalid input:", word)
 			}
 		}
 	}
+	WriteFile(s, banner)
 }

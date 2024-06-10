@@ -17,7 +17,7 @@ func main() {
 	banner := *utils.OutputPtr
 	// reads contents of the provided
 
-	content, err := os.ReadFile("standard.txt")
+	content, err := os.ReadFile(args[1])
 	if err != nil {
 		fmt.Println("invalid text file")
 		return
