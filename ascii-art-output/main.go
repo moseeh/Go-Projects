@@ -14,7 +14,6 @@ func main() {
 		return
 	}
 
-	
 	// reads contents of the provided
 	content, err := os.ReadFile("standard.txt")
 	if err != nil {
