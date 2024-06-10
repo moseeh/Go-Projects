@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func DisplayText(input string, contentLines []string) {
+func DisplayText(input string, banner string, contentLines []string) {
 	if input == "" {
 		return
 	}
@@ -23,7 +23,7 @@ func DisplayText(input string, contentLines []string) {
 			fmt.Println()
 		} else {
 			if IsEnglish(word) {
-				PrintWord(word, contentLines)
+				PrintWord(word, banner, contentLines)
 			} else {
 				fmt.Println("Invalid input:", word)
 			}

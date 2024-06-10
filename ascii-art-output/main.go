@@ -1,10 +1,10 @@
 package main
 
 import (
-	"ascii-art/utils"
 	"fmt"
 	"os"
-	"strings"
+
+	"ascii-art/utils"
 )
 
 func main() {
@@ -13,8 +13,10 @@ func main() {
 		fmt.Println("Please provide text to display.")
 		return
 	}
-
+	args := utils.ParseFlag()
+	banner := *utils.OutputPtr
 	// reads contents of the provided
+
 	content, err := os.ReadFile("standard.txt")
 	if err != nil {
 		fmt.Println("invalid text file")
@@ -26,5 +28,5 @@ func main() {
 		fmt.Println("invalid text file")
 		return
 	}
-	utils.DisplayText(strings.Join(os.Args[1:], " "), contentLines)
+	utils.DisplayText(args[0], banner, contentLines)
 }
