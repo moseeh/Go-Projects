@@ -24,5 +24,6 @@ func main() {
 		fmt.Println("invalid text file")
 		return
 	}
-	utils.DisplayText(os.Args[1], contentLines)
+	s, _ := utils.DisplayText(os.Args[1], contentLines)
+	fmt.Print(s)
 }
