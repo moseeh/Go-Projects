@@ -1,19 +1,27 @@
 package utils
 
-// takes second argument and returns its filepath as a string
-func GetFile(banner string) string {
-	// Handle cases where there are three or more arguments
-	bannerFile := ""
+import (
+	"fmt"
+	"os"
+)
+
+func ReadBannerFile(banner string) ([]byte, error) {
+	var filename string
 	switch banner {
 	case "standard":
-		bannerFile = "banners/standard.txt"
-	case "thinkertoy":
-		bannerFile = "banners/thinkertoy.txt"
+		filename = "banners/standard.txt"
 	case "shadow":
-		bannerFile = "banners/shadow.txt"
+		filename = "banners/shadow.txt"
+	case "thinkertoy":
+		filename = "banners/thinkertoy.txt"
 	default:
-		bannerFile = "Invalid bannerfile name"
+		return nil, fmt.Errorf("invalid banner type")
 	}
 
-	return bannerFile
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
 }

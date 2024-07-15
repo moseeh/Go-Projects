@@ -2,28 +2,18 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"net/http"
 	"web/utils"
 )
 
 func main() {
-	// checks if there input provived
-	if len(os.Args) < 2 {
-		fmt.Println("Please provide text to display.")
-		return
-	}
-	// reads contents of the provided
-	content, err := os.ReadFile(utils.GetFile(os.Args[2]))
-	if err != nil {
-		fmt.Println("invalid text file")
-		return
-	}
-	contentLines := utils.SplitFile(string(content))
-	// checks if the file provided contains 856 lines
-	if len(contentLines) != 856 {
-		fmt.Println("invalid text file")
-		return
-	}
-	s, _ := utils.DisplayText(os.Args[1], contentLines)
-	fmt.Print(s)
+    http.HandleFunc("/", utils.HandleIndex)
+    http.HandleFunc("/generate", utils.HandleGenerate)
+
+    // Handle 404 errors
+    http.HandleFunc("/404", utils.Handle404)
+    http.HandleFunc("/favicon.ico", utils.Handle404)
+
+    fmt.Println("Server is running on http://localhost:8080")
+    http.ListenAndServe(":8080", http.HandlerFunc(utils.RouteHandler))
 }
