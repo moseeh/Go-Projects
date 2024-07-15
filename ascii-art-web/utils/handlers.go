@@ -18,7 +18,7 @@ func HandleIndex(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/404", http.StatusFound)
 		return
 	}
-	tmpl, err := template.ParseFiles("index.html")
+	tmpl, err := template.ParseFiles("templates/index.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -54,7 +54,7 @@ func HandleGenerate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("result.html")
+	tmpl, err := template.ParseFiles("templates/result.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
