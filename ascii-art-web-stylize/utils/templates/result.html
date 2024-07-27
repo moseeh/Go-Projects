@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ASCII Art Result</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+h1 {
+    color: #333;
+}
+pre {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    white-space: pre;
+    word-wrap: normal;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 300px;
+    max-width: 80vw;
+    width: 80vw;
+}
+.result {
+    margin-top: 20px;
+}
+.result a {
+    text-decoration: none;
+    color: #007BFF;
+    font-size: 1em;
+}
+.result a:hover {
+    color: #0056b3;
+}
+</style>
+</head>
+<body>
+<h1>Generated ASCII Art</h1>
+<pre>{{.Art}}</pre>
+<div class="result">
+<a href="/">Go back</a>
+</div>
+</body>
+</html>

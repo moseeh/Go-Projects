@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Art Result</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon.png">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Your ASCII Art</h1>
+        <div class="result-container">
+            <h2>Original Text:</h2>
+            <pre class="input">{{.Input}}</pre>
+            <h2>ASCII Art:</h2>
+            <div class="scrollable-result">
+                <pre class="art">{{.Art}}</pre>
+            </div>
+        </div>
+        <a href="/" class="button">Create Another</a>
+    </main>
+    <footer>
+        <p>&copy; 2024 ASCII Art Web. All rights reserved.</p>
+    </footer>
+</body>
+</html>

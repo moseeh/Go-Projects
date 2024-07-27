@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ASCII Art Generator</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon.png">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>ASCII Art Generator</h1>
+        <form action="/ascii-art" method="post" autocomplete="off">
+            <label for="input">Enter Your Text:</label>
+            <textarea id="input" name="input" rows="4" placeholder="Type something here..." required></textarea>
+            
+            <label for="banner">Choose a Banner:</label>
+            <select id="banner" name="banner">
+                <option value="standard">Standard</option>
+                <option value="thinkertoy">Thinkertoy</option>
+                <option value="shadow">Shadow</option>
+            </select>
+            
+            <button type="submit">Generate ASCII Art</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2024 ASCII Art Web. All rights reserved.</p>
+    </footer>
+</body>
+</html>
