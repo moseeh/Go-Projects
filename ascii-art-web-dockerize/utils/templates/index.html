@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ASCII Art Generator</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+form {
+    width: 100%;
+}
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 20px;
+}
+legend {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    background: #007BFF;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+}
+button:hover {
+    background: #0056b3;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>ASCII-ART-WEB</h1>
+    <form action="/generate" method="post" autocomplete="off">
+        <fieldset>
+            <legend>Enter Your Text</legend>
+            <label for="input">Text:</label>
+            <textarea id="input" name="input" rows="2" placeholder="Type something here..." required></textarea>
+            <br>
+            <label for="banner">Banner:</label>
+            <select id="banner" name="banner">
+                <option value="standard">Standard</option>
+                <option value="thinkertoy">Thinkertoy</option>
+                <option value="shadow">Shadow</option>
+            </select>
+        </fieldset>
+        <br>
+        <button type="submit">Generate</button>
+    </form>
+</div>
+</body>
+</html>
