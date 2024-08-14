@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"groupie-tracker/handlers"
 	"groupie-tracker/utils"
+	"net/http"
 )
 
 func main() {
@@ -37,4 +39,8 @@ func main() {
 		}
 		fmt.Println("------------------------")
 	}
+
+	http.HandleFunc("/", handlers.ArtistHandler)
+	http.ListenAndServe(":9090", nil)
+
 }
