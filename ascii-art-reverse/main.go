@@ -1,115 +1,55 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
+
+	"ascii-art-reverse/asciiArt"
+	"ascii-art-reverse/utils"
 )
 
 func main() {
+	// Check if an argument is provided
+	if !utils.CheckArgs() {
+		fmt.Printf("Usage: go run . [OPTION]\n\nEX: go run . --reverse=<fileName>\n")
+		return
+	}
+
+	// initializing banner file paths
 	standardFile := "banners/standard.txt"
-	sampleFile := "sample.txt"
+	shadowFile := "banners/shadow.txt"
+	thinkertoyFile := "banners/thinkertoy.txt"
 
-	// Create a mapping from standard.txt
-	artToChar := parseStandardFile(standardFile)
+	// parsing flags
+	utils.ParseFlag()
+	sampleFile := *utils.ReversePtr
+	// if no flag is provided, switch to accept printable ascii input and display their banner files in the terminal
 
-	// Decode the sample.txt using the mapping
-	decodedString := decodeSampleFile(sampleFile, artToChar)
+	if sampleFile == "" {
+		// If no flag is provided, use the Filename function to decide the file to be used
+		asciiArt.ArtMaker()
+	} else {
+		bannerFiles := []string{standardFile, shadowFile, thinkertoyFile}
+		var decodedString string
+		var success bool
 
-	// Print the result
-	fmt.Println(decodedString)
-}
-
-func parseStandardFile(filename string) map[string]string {
-	file, err := os.Open(filename)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return nil
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	artToChar := make(map[string]string)
-	var art []string
-	charCode := 32 // Start with ASCII code 32
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		if line == "" {
-			if len(art) == 8 { // Each character's art is 8 lines
-				artToChar[strings.Join(art, "\n")] = string(rune(charCode))
-				art = []string{}
-				charCode++
+		for _, bannerFile := range bannerFiles {
+			artToChar := utils.ParseBannerFile(bannerFile)
+			lines, err := utils.ParseFile(sampleFile)
+			if err != nil {
+				fmt.Println(err)
+				return
 			}
-		} else {
-			art = append(art, line)
-		}
-	}
-
-	if len(art) == 8 { // Last character case
-		artToChar[strings.Join(art, "\n")] = string(rune(charCode))
-	}
-
-	return artToChar
-}
-
-func decodeSampleFile(filename string, artToChar map[string]string) string {
-	file, err := os.Open(filename)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return ""
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-
-	// Each character's ASCII art is 8 lines high
-	artHeight := 8
-	var decodedString strings.Builder
-
-	// Iterate through the lines and match segments to characters
-	lineLength := len(lines[0])
-	for i := 0; i < lineLength; {
-		//var segment []string
-		maxWidth := 0
-		for j := 0; j < artHeight; j++ {
-			if i < len(lines[j]) {
-				//segment = append(segment, lines[j][i:])
-				if maxWidth < len(lines[j][i:]) {
-					maxWidth = len(lines[j][i:])
-				}
-			} else {
-				//segment = append(segment, "")
-			}
-		}
-		//charArt := strings.Join(segment, "\n")
-		found := false
-		for width := 1; width <= maxWidth; width++ {
-			subArt := []string{}
-			for j := 0; j < artHeight; j++ {
-				if i+width <= len(lines[j]) {
-					subArt = append(subArt, lines[j][i:i+width])
-				} else {
-					subArt = append(subArt, lines[j][i:])
-				}
-			}
-			charArt := strings.Join(subArt, "\n")
-			if val, exists := artToChar[charArt]; exists {
-				decodedString.WriteString(val)
-				i += width
-				found = true
+			decodedString = utils.DecodeFile(lines, artToChar)
+			if decodedString != "" {
+				success = true
 				break
 			}
 		}
-		if !found {
-			i++ // If no match is found
+
+		if success {
+			fmt.Print(decodedString)
+		} else {
+			fmt.Println("Error: Could not decode the ASCII art using any of the banner files.")
 		}
 	}
-
-	return decodedString.String()
 }
