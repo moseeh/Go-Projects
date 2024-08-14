@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groupie Tracker</title>
+    <style>
+        body {
+            background-color: #000000;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color:aqua;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            justify-content: center;
+        }
+        .artists {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .card-grid {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            width: 300px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card-grid:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .members-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .members-list li {
+            margin-bottom: 5px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #45a049;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <center><h1>Groupie Tracker</h1></center>
+    <div class="artists">
+        {{ range . }}
+        <div class="card-grid">
+            <h2>{{.Name}}</h2>
+            <div class="image">
+                <img src="{{.Image}}" alt="{{.Name}}">
+            </div>
+            <p><strong>Members:</strong></p>
+            <ul class="members-list">
+                {{range .Members}}
+                <li>{{.}}</li>
+                {{end}}
+            </ul>
+            <p><strong>Creation Date:</strong> {{.CreationDate}}</p>
+            <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
+            <p><strong>Locations:</strong> <a href="{{.Locations}}">View Locations</a></p>
+            <p><strong>Concert Dates:</strong> <a href="{{.ConcertDates}}">View Dates</a></p>
+            <p><strong>Relations:</strong> <a href="{{.Relations}}">View Relations</a></p>
+        </div>
+        {{end}}
+    </div>
+</body>
+</html>
