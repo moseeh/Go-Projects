@@ -10,9 +10,10 @@
             font-family: Arial, sans-serif;
         }
         h1 {
-            color:aqua;
+            color: aqua;
             font-family: Georgia, 'Times New Roman', Times, serif;
-            justify-content: center;
+            text-align: center;
+            margin-top: 20px;
         }
         .artists {
             display: flex;
@@ -63,13 +64,13 @@
     </style>
 </head>
 <body>
-    <center><h1>Groupie Tracker</h1></center>
+    <h1>Groupie Tracker</h1>
     <div class="artists">
         {{ range . }}
         <div class="card-grid">
             <h2>{{.Name}}</h2>
             <div class="image">
-                <img src="{{.Image}}" alt="{{.Name}}">
+                <img src="{{.Image}}" alt="Image of {{.Name}}">
             </div>
             <p><strong>Members:</strong></p>
             <ul class="members-list">
@@ -79,9 +80,9 @@
             </ul>
             <p><strong>Creation Date:</strong> {{.CreationDate}}</p>
             <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
-            <p><strong>Locations:</strong> <a href="{{.Locations}}">View Locations</a></p>
-            <p><strong>Concert Dates:</strong> <a href="{{.ConcertDates}}">View Dates</a></p>
-            <p><strong>Relations:</strong> <a href="{{.Relations}}">View Relations</a></p>
+            <p><strong>Locations:</strong> <a href="/locations/{{.Id}}">View Locations</a></p>
+            <p><strong>Concert Dates:</strong> <a href="/concerts/{{.Id}}">View Dates</a></p>
+            <p><strong>Relations:</strong> <a href="/relations/{{.Id}}">View Relations</a></p>
         </div>
         {{end}}
     </div>

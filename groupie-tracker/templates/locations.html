@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Details</title>
+    <style>
+        body {
+            background-color: #000000;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: aqua;
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .artist-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .artist-info img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .artist-info h2 {
+            color: #ffffff;
+            margin: 10px 0;
+        }
+        .location {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            width: 300px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: inline-block; /* Ensures card-style layout */
+        }
+        .location:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .location h2 {
+            margin: 0;
+            color: #555;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        .location p {
+            margin: 5px 0;
+        }
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #45a049;
+            text-decoration: underline;
+        }
+        /* Additional styling if needed */
+    </style>
+</head>
+<body>
+    <h1>Location Details</h1>
+    {{ if .Artist }}
+        <div class="artist-info">
+            <img src="{{ .Artist.Image }}" alt="Image of {{ .Artist.Name }}">
+            <h2>{{ .Artist.Name }}</h2>
+        </div>
+    {{ end }}
+    {{ if .Locations }}
+        {{ range .Locations }}
+            <div class="location">
+                <h2>Location ID: {{ $.Id }}</h2>
+                <p><strong>Location Name:</strong> {{ . }}</p>
+                <p><strong>Date:</strong> <a href="{{ $.Dates }}">{{ $.Dates }}</a></p>
+            </div>
+        {{ end }}
+    {{ else }}
+        <p>No locations available.</p>
+    {{ end }}
+</body>
+</html>
