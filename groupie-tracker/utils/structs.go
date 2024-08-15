@@ -25,18 +25,13 @@ type Location struct {
 	Dates     string   `json:"dates"`
 }
 
-type LocationIndex struct {
-	Index []Location `json:"index"`
-}
 
 type Date struct {
 	Id    int      `json:"id"`
 	Dates []string `json:"dates"`
 }
 
-type DateIndex struct {
-	Index []Date `json:"index"`
-}
+
 
 type RelationIndex struct {
 	Index []Relations
