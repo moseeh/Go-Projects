@@ -9,6 +9,7 @@
             background-color: #000000;
             font-family: Arial, sans-serif;
             margin: 20px;
+            color: #ffffff;
         }
         h1 {
             color: aqua;
@@ -29,17 +30,22 @@
             color: #ffffff;
             margin: 10px 0;
         }
+        .locations-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
         .location {
             background-color: #ffffff;
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 16px;
-            margin-bottom: 20px;
-            width: 300px;
+            width: 250px;
             box-sizing: border-box;
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: inline-block; /* Ensures card-style layout */
         }
         .location:hover {
             transform: translateY(-5px);
@@ -53,6 +59,7 @@
         }
         .location p {
             margin: 5px 0;
+            color: #333;
         }
         a {
             color: #4CAF50;
@@ -63,27 +70,33 @@
             color: #45a049;
             text-decoration: underline;
         }
-        /* Additional styling if needed */
     </style>
 </head>
 <body>
     <h1>Location Details</h1>
     {{ if .Artist }}
-        <div class="artist-info">
-            <img src="{{ .Artist.Image }}" alt="Image of {{ .Artist.Name }}">
-            <h2>{{ .Artist.Name }}</h2>
-        </div>
+    <div class="artist-info">
+        <img src="{{ .Artist.Image }}" alt="Image of {{ .Artist.Name }}">
+        <h2>{{ .Artist.Name }}</h2>
+    </div>
     {{ end }}
+
     {{ if .Locations }}
-        {{ range .Locations }}
-            <div class="location">
-                <h2>Location ID: {{ $.Id }}</h2>
-                <p><strong>Location Name:</strong> {{ . }}</p>
-                <p><strong>Date:</strong> <a href="{{ $.Dates }}">{{ $.Dates }}</a></p>
-            </div>
+    <div class="locations-container">
+        {{ range $index, $location := .Locations.Locations }}
+        <div class="location">
+            <h2>Venue {{ add $index 1 }}</h2>
+            <p><strong>Location:</strong> {{ $location }}</p>
+            {{ if $.Dates.Dates }}
+                {{ if lt $index (len $.Dates.Dates) }}
+                <p><strong>Date:</strong> {{ index $.Dates.Dates $index }}</p>
+                {{ end }}
+            {{ end }}
+        </div>
         {{ end }}
+    </div>
     {{ else }}
-        <p>No locations available.</p>
+    <p>No locations available.</p>
     {{ end }}
 </body>
 </html>
