@@ -9,5 +9,5 @@ import (
 func main() {
 	http.HandleFunc("/", handlers.ArtistHandler)
 	http.HandleFunc("/locations/", handlers.LocationHandler)
-	http.ListenAndServe(":9090", nil)
+	http.ListenAndServe(":8080", nil)
 }
