@@ -6,13 +6,16 @@
     <title>Groupie Tracker</title>
     <style>
         body {
-            background-color: #000000;
-            font-family: Arial, sans-serif;
+            background-color: #121212; /* Dark gray background for consistency */
+            font-family: 'Roboto', sans-serif; /* Updated to match previous recommendation */
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0; /* Light gray text for better contrast */
         }
         h1 {
-            color: #228B22;
-            font-size: 5em;
-            font-family: 'Brush Script MT', cursive;
+            color: #ff4081; /* Bright pink for vibrant heading */
+            font-size: 4em;
+            font-family: 'Montserrat', sans-serif; /* Consistent font choice */
             text-align: center;
             margin-top: 20px;
         }
@@ -20,21 +23,22 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            margin-top: 40px;
         }
         .card-grid {
-            background-color: #dcdad8 ;
-            border: 1px solid #ddd;
+            background-color: #1e1e1e; /* Slightly lighter than body for contrast */
+            border: 1px solid #333;
             border-radius: 8px;
             padding: 16px;
             margin: 16px;
             width: 300px;
             box-sizing: border-box;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
         .card-grid:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
         .image img {
             max-width: 100%;
@@ -49,23 +53,23 @@
             margin-bottom: 5px;
         }
         h2 {
-            color: #333;
-            border-bottom: 2px solid #4CAF50;
+            color: #ffffff;
+            border-bottom: 2px solid #ff4081;
             padding-bottom: 5px;
         }
         a {
-            color: #4CAF50;
+            color: #ff4081; /* Bright green for contrast */
             text-decoration: none;
             transition: color 0.3s ease;
         }
         a:hover {
-            color: #45a049;
+            color: #66bb6a;
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>Gig Navigator</h1>
+    <h1>Concert Compass</h1> <!-- Changed from 'Gig Navigator' to 'Concert Compass' -->
     <div class="artists">
         {{ range . }}
         <div class="card-grid">
@@ -73,15 +77,9 @@
             <div class="image">
                 <img src="{{.Image}}" alt="Image of {{.Name}}">
             </div>
-            <p><strong>Members:</strong></p>
-            <ul class="members-list">
-                {{range .Members}}
-                <li>{{.}}</li>
-                {{end}}
-            </ul>
             <p><strong>Creation Date:</strong> {{.CreationDate}}</p>
             <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
-            <p><strong>Locations:</strong> <a href="/locations/{{.Id}}">View Locations</a></p>
+            <p><strong>Details:</strong> <a href="/locations/{{.Id}}">View Details</a></p>
         </div>
         {{end}}
     </div>
