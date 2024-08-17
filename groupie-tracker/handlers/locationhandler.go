@@ -24,6 +24,14 @@ func LocationHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err1)
 	}
 	Artists := utils.GetArtists(utils.GetApiIndex().Artists)
+
+	// Format locations
+	formattedLocations := make(map[string][]string)
+	for location, datesList := range relations.DatesLocations {
+		formattedLocation := formatLocation(location)
+		formattedLocations[formattedLocation] = datesList
+	}
+
 	data := struct {
 		Artist    utils.Artist
 		Locations utils.Location
@@ -33,24 +41,39 @@ func LocationHandler(w http.ResponseWriter, r *http.Request) {
 		Artist:    Artists[id-1],
 		Locations: locations,
 		Dates:     dates,
-		Relations: relations,
+		Relations: utils.Relations{DatesLocations: formattedLocations},
 	}
 
 	tmpl, err := template.New("locations.html").Funcs(template.FuncMap{
 		"hasPrefix":  strings.HasPrefix,
 		"trimPrefix": strings.TrimPrefix,
 	}).ParseFiles("templates/locations.html")
-
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-
 	err = tmpl.Execute(w, data)
 	if err != nil {
 		fmt.Printf("Template execution error: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func formatLocation(location string) string {
+	// Replace "-" and "_" with spaces
+	location = strings.ReplaceAll(location, "-", " ")
+	location = strings.ReplaceAll(location, "_", " ")
+
+	// Split the string into words
+	words := strings.Fields(location)
+
+	// Capitalize each word
+	for i, word := range words {
+		words[i] = strings.Title(strings.ToLower(word))
+	}
+
+	// Join the words back together
+	return strings.Join(words, " ")
 }
