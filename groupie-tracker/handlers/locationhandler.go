@@ -87,7 +87,7 @@ func LocationHandler(w http.ResponseWriter, r *http.Request) {
 
 func formatLocation(location string) string {
 	// Replace "-" and "_" with spaces
-	location = strings.ReplaceAll(location, "-", " ")
+	location = strings.ReplaceAll(location, "-", ", ")
 	location = strings.ReplaceAll(location, "_", " ")
 
 	// Split the string into words
