@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body {
+            background-color: #121212; /* Dark gray background */
+            font-family: 'Roboto', sans-serif; /* Consistent font choice */
+            margin: 20px;
+            color: #e0e0e0; /* Light gray text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1, h2 {
+            color: #ff4081; /* Bright pink heading */
+            font-family: 'Montserrat', sans-serif; /* Consistent font choice */
+            margin-top: 20px;
+        }
+        .artists {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 40px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .card-grid {
+            background-color: #1e1e1e; /* Slightly lighter background */
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px;
+            width: 300px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .card-grid:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .members-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .members-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .members-list li::before {
+            content: "•";
+            color: #ff4081; /* Bright pink bullet points */
+            position: absolute;
+            left: 0;
+            font-size: 1.2em;
+        }
+        h2 {
+            color: #ffffff;
+            border-bottom: 2px solid #ff4081;
+            padding-bottom: 5px;
+        }
+        p {
+            margin: 10px 0;
+        }
+        a {
+            color: #ff4081; /* Pink links */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #66bb6a; /* Green on hover */
+            text-decoration: underline;
+        }
+        .no-results {
+            color: #ff4081;
+            text-align: center;
+            margin-top: 50px;
+            font-size: 1.5em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Results</h1> 
+    {{ if . }}
+    <div class="artists">
+        {{ range . }}
+        <div class="card-grid">
+            <div class="image">
+                <img src="{{ .Image }}" alt="Image of {{ .Name }}">
+            </div>
+            <h2>{{ .Name }}</h2>
+            <p><strong>Creation Date:</strong> {{.CreationDate}}</p>
+            <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
+            <p><strong>Details:</strong> <a href="/locations/{{.Id}}">View Details</a></p>
+        </div>
+        {{ end }}
+    </div>
+    {{ else }}
+    <p class="no-results">No artists found matching your search criteria.</p>
+    {{ end }}
+</body>
+</html>
