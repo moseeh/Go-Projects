@@ -6,27 +6,54 @@
     <title>Groupie Tracker</title>
     <style>
         body {
-            background-color: #121212; /* Dark gray background for consistency */
-            font-family: 'Roboto', sans-serif; /* Updated to match previous recommendation */
+            background-color: #121212; /* Dark gray background */
+            font-family: 'Roboto', sans-serif; /* Consistent font choice */
             margin: 0;
             padding: 20px;
-            color: #e0e0e0; /* Light gray text for better contrast */
+            color: #e0e0e0; /* Light gray text */
         }
         h1 {
-            color: #ff4081; /* Bright pink for vibrant heading */
+            color: #ff4081; /* Bright pink heading */
             font-size: 4em;
             font-family: 'Montserrat', sans-serif; /* Consistent font choice */
             text-align: center;
-            margin-top: 20px;
+            margin-top: 60px; /* Increased margin to move content lower */
+        }
+        form {
+            text-align: center;
+            margin-top: 40px; /* Move the form lower */
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 700px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-color: #1e1e1e; /* Match card background */
+            color: #e0e0e0; /* Light gray text */
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff4081; /* Pink button */
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #66bb6a; /* Green on hover */
         }
         .artists {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 40px;
+            margin-top: 60px; /* Increased margin to move content lower */
         }
         .card-grid {
-            background-color: #1e1e1e; /* Slightly lighter than body for contrast */
+            background-color: #1e1e1e; /* Slightly lighter background */
             border: 1px solid #333;
             border-radius: 8px;
             padding: 16px;
@@ -58,7 +85,7 @@
             padding-bottom: 5px;
         }
         a {
-            color: #ff4081; /* Bright green for contrast */
+            color: #ff4081; 
             text-decoration: none;
             transition: color 0.3s ease;
         }
@@ -69,7 +96,11 @@
     </style>
 </head>
 <body>
-    <h1>Concert Compass</h1> <!-- Changed from 'Gig Navigator' to 'Concert Compass' -->
+    <h1>Concert Compass</h1> 
+    <form action="/search" method="GET">
+        <input type="text" name="query" placeholder="Search artists..." required>
+        <button type="submit">Search</button>
+    </form>
     <div class="artists">
         {{ range . }}
         <div class="card-grid">
