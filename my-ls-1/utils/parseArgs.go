@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"my-ls-1/models"
@@ -12,19 +14,20 @@ func ParseArgs(args []string) (models.Options, []string) {
 
 	for _, arg := range args {
 		if strings.HasPrefix(arg, "-") {
-			for _, ch := range arg[1:] {
-				switch ch {
-				case 'l':
-					options.Long = true
-				case 'R':
-					options.Recursive = true
-				case 'a':
-					options.All = true
-				case 'r':
-					options.Reverse = true
-				case 't':
-					options.SortByTime = true
-				}
+			switch arg {
+			case "-l":
+				options.Long = true
+			case "-R", "--recursive":
+				options.Recursive = true
+			case "-a", "--all":
+				options.All = true
+			case "-r", "--reverse":
+				options.Reverse = true
+			case "-t", "--time":
+				options.SortByTime = true
+			default:
+				fmt.Printf("Warning: Unknown flag %s\n", arg)
+				os.Exit(0)
 			}
 		} else {
 			paths = append(paths, arg)
