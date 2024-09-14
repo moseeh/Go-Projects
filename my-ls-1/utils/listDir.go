@@ -3,9 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"syscall"
 
@@ -69,44 +67,4 @@ func ListDir(path string, options models.Options, indent string) error {
 	}
 
 	return nil
-}
-
-func printShortFormat(entries []models.FileInfo, indent string) {
-	for _, entry := range entries {
-		fmt.Printf("%s%s  ", indent, entry.Name)
-	}
-	fmt.Println()
-}
-
-func printLongFormat(entries []models.FileInfo, indent string) {
-	var totalBlocks int64
-	for _, entry := range entries {
-		totalBlocks += (entry.Size + 511) / 512
-	}
-	fmt.Printf("%stotal %d\n", indent, totalBlocks)
-
-	for _, entry := range entries {
-		modeStr := entry.Mode.String()
-		linkCount := strconv.Itoa(entry.Links)
-		size := strconv.FormatInt(entry.Size, 10)
-		timeStr := entry.ModTime.Format("Jan _2 15:04")
-		fmt.Printf("%s%s %3s %-8s %-8s %8s %s %s\n",
-			indent, modeStr, linkCount, entry.User, entry.Group, size, timeStr, entry.Name)
-	}
-}
-
-func getUserName(uid int) string {
-	u, err := user.LookupId(strconv.Itoa(uid))
-	if err != nil {
-		return strconv.Itoa(uid)
-	}
-	return u.Username
-}
-
-func getGroupName(gid int) string {
-	g, err := user.LookupGroupId(strconv.Itoa(gid))
-	if err != nil {
-		return strconv.Itoa(gid)
-	}
-	return g.Name
 }
