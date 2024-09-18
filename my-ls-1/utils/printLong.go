@@ -19,7 +19,13 @@ func printLongFormat(entries []models.FileInfo, indent string) {
 		linkCount := strconv.Itoa(entry.Links)
 		size := strconv.FormatInt(entry.Size, 10)
 		timeStr := entry.ModTime.Format("Jan _2 15:04")
-		fmt.Printf("%s%s %3s %-8s %-8s %8s %s %s\n",
-			indent, modeStr, linkCount, entry.User, entry.Group, size, timeStr, entry.Name)
+		if entry.IsDir {
+			fmt.Printf("%s%s %3s %-8s %-8s %8s %s \033[38;2;0;120;255m%s\033[0m\n",
+				indent, modeStr, linkCount, entry.User, entry.Group, size, timeStr, entry.Name)
+		} else {
+			fmt.Printf("%s%s %3s %-8s %-8s %8s %s %s\n",
+				indent, modeStr, linkCount, entry.User, entry.Group, size, timeStr, entry.Name)
+		}
+
 	}
 }
