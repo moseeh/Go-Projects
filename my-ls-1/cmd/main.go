@@ -12,6 +12,7 @@ func main() {
 	if len(paths) == 0 {
 		paths = []string{"."}
 	}
+	utils.SortPath(paths)
 
 	for i, path := range paths {
 		if i > 0 {
