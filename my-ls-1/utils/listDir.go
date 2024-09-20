@@ -11,12 +11,45 @@ import (
 )
 
 func ListDir(path string, options models.Options, indent string) error {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if !fileInfo.IsDir() {
+		// If it's a file, just print its name and return
+		fmt.Println(path)
+		return nil
+	}
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
 
 	fileInfos := make([]models.FileInfo, 0, len(entries))
+	addSpecialEntry := func(name string) {
+		info, err := os.Stat(filepath.Join(path, name))
+		if err == nil {
+			fileInfo := models.FileInfo{
+				Name:    name,
+				Mode:    info.Mode(),
+				Size:    info.Size(),
+				ModTime: info.ModTime(),
+				IsDir:   info.IsDir(),
+			}
+			if options.Long {
+				stat := info.Sys().(*syscall.Stat_t)
+				fileInfo.Links = int(stat.Nlink)
+				fileInfo.User = getUserName(int(stat.Uid))
+				fileInfo.Group = getGroupName(int(stat.Gid))
+			}
+			fileInfos = append(fileInfos, fileInfo)
+		}
+	}
+	if options.All {
+		addSpecialEntry(".")
+		addSpecialEntry("..")
+	}
+
 	for _, entry := range entries {
 		if !options.All && strings.HasPrefix(entry.Name(), ".") {
 			continue
@@ -55,7 +88,7 @@ func ListDir(path string, options models.Options, indent string) error {
 
 	if options.Recursive {
 		for _, info := range fileInfos {
-			if info.IsDir && (options.All || !strings.HasPrefix(info.Name, ".")) {
+			if info.IsDir && info.Name != "." && info.Name != ".." && (options.All || !strings.HasPrefix(info.Name, ".")) {
 				fullPath := filepath.Join(path, info.Name)
 				fmt.Printf("\n%s%s:\n", indent, fullPath)
 				err := ListDir(fullPath, options, indent+"  ")
@@ -65,6 +98,5 @@ func ListDir(path string, options models.Options, indent string) error {
 			}
 		}
 	}
-
 	return nil
 }
