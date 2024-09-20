@@ -1,26 +1,70 @@
 package utils
 
 import (
-	"sort"
+	"strings"
 
 	"my-ls-1/models"
 )
 
 func sortEntries(entries []models.FileInfo, options models.Options) {
-	sort.Slice(entries, func(i, j int) bool {
-		if options.SortByTime {
-			if entries[i].ModTime.Equal(entries[j].ModTime) {
-				return entries[i].Name < entries[j].Name
+	n := len(entries)
+	for i := 0; i < n-1; i++ {
+		for j := 0; j < n-i-1; j++ {
+			if shouldSwap(entries[j], entries[j+1], options) {
+				entries[j], entries[j+1] = entries[j+1], entries[j]
 			}
-			return entries[i].ModTime.After(entries[j].ModTime)
-		}
-		return entries[i].Name < entries[j].Name
-	})
-
-	if options.Reverse {
-		for i := len(entries)/2 - 1; i >= 0; i-- {
-			opp := len(entries) - 1 - i
-			entries[i], entries[opp] = entries[opp], entries[i]
 		}
 	}
+
+	// Reverse the slice if the reverse option is enabled
+	if options.Reverse {
+		for i := 0; i < n/2; i++ {
+			entries[i], entries[n-1-i] = entries[n-1-i], entries[i]
+		}
+	}
+}
+
+func shouldSwap(a, b models.FileInfo, options models.Options) bool {
+	// Always keep . and .. at the top, in that order
+	if a.Name == "." && b.Name == ".." {
+		return false
+	}
+	if b.Name == ".." && a.Name == "." {
+		return true
+	}
+	// Sort by modification time if the option is enabled
+	if options.SortByTime {
+		if !a.ModTime.Equal(b.ModTime) {
+			return a.ModTime.Before(b.ModTime)
+		}
+	}
+
+	// Use ls-like lexicographical order
+	return lsLess(a.Name, b.Name)
+}
+
+// lsLess mimics the ls command's lexicographical ordering
+func lsLess(a, b string) bool {
+	aDot := strings.HasPrefix(a, ".")
+	bDot := strings.HasPrefix(b, ".")
+	aLower, bLower := "", ""
+
+	if aDot {
+		aLower = strings.ToLower(a[1:])
+	} else {
+		aLower = strings.ToLower(a)
+	}
+
+	if bDot {
+		bLower = strings.ToLower(b[1:])
+	} else {
+		bLower = strings.ToLower(b)
+	}
+
+	if aLower != bLower {
+		return aLower > bLower
+	}
+
+	// If both names are equal lexicographically, compare the original case-sensitive names
+	return a > b
 }
