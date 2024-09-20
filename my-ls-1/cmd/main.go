@@ -13,10 +13,16 @@ func main() {
 		paths = []string{"."}
 	}
 
-	for _, path := range paths {
+	for i, path := range paths {
+		if i > 0 {
+			fmt.Println()
+		}
+		if len(paths) > 1 {
+			fmt.Printf("%s:\n", path)
+		}
 		err := utils.ListDir(path, options, "")
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "my-ls: %v\n", err)
+			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
 		}
 	}
 }
