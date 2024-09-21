@@ -9,31 +9,36 @@ import (
 
 func printLongFormat(entries []models.FileInfo, indent string) {
 	var totalBlocks int64
-	sizeLen, linkLen := 0, 0
+	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
+
 	for _, entry := range entries {
-		totalBlocks += (entry.Size + 511) / 512
+		totalBlocks += (entry.Size + 1023) / 1024 // Round up to the nearest 1024 bytes
 		size := strconv.FormatInt(entry.Size, 10)
-		if sizeLen < len(size) {
-			sizeLen = len(size)
-		}
 		linkCount := strconv.Itoa(entry.Links)
-		if linkLen < len(linkCount) {
-			linkLen = len(linkCount)
-		}
+		sizeLen = max(sizeLen, len(size))
+		linkLen = max(linkLen, len(linkCount))
+		userLen = max(userLen, len(entry.User))
+		groupLen = max(groupLen, len(entry.Group))
 	}
+
 	fmt.Printf("%stotal %d\n", indent, totalBlocks)
+
 	for _, entry := range entries {
 		modeStr := entry.Mode.String()
 		linkCount := strconv.Itoa(entry.Links)
 		size := strconv.FormatInt(entry.Size, 10)
 		timeStr := entry.ModTime.Format("Jan _2 15:04")
-		if entry.IsDir {
-			fmt.Printf("%s%s %*s %-8s %s %*s %s \033[38;2;0;120;255m%s\033[0m\n",
-				indent, modeStr, linkLen, linkCount, entry.User, entry.Group, sizeLen, size, timeStr, entry.Name)
-		} else {
-			fmt.Printf("%s%s %*s %-8s %s %*s %s %s\n",
-				indent, modeStr, linkLen, linkCount, entry.User, entry.Group, sizeLen, size, timeStr, entry.Name)
-		}
+		color := getFileColor(entry.Mode, entry.Name)
 
+		fmt.Printf("%s%-11s %*s %-*s %-*s %*s %s %s%s\033[0m\n",
+			indent, modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
+			sizeLen, size, timeStr, color, entry.Name)
 	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
