@@ -31,7 +31,7 @@ func GetTerminalWidth() (int, error) {
 	return int(ws.Col), nil
 }
 
-func printShortFormat(entries []models.FileInfo, indent string) {
+func printShortFormat(entries []models.FileInfo) {
 	// Get the terminal width
 	termWidth, err := GetTerminalWidth()
 	if err != nil {
@@ -88,7 +88,7 @@ func printShortFormat(entries []models.FileInfo, indent string) {
 				color := getFileColor(entry.Mode, entry.Name)
 
 				// Print the file name with the corresponding color, ensuring the background color stays behind the text only
-				fmt.Printf("%s%s%-*s\033[0m", indent, color, colWidths[col], entry.Name)
+				fmt.Printf("%s%-*s\033[0m", color, colWidths[col], entry.Name)
 
 				// Add spacing between columns
 				fmt.Printf("  ") // Two spaces between columns for better readability
