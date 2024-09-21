@@ -21,7 +21,7 @@ func main() {
 		if len(paths) > 1 {
 			fmt.Printf("%s:\n", path)
 		}
-		err := utils.ListDir(path, options, "")
+		err := utils.ListDir(path, options)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
 		}
