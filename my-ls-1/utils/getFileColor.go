@@ -53,7 +53,7 @@ func getColorByExtension(ext string) string {
 		return "\033[0;32m" // Green (shell script)
 	case "py", "rb", "pl", "php":
 		return "\033[0;34m" // Blue (interpreted language script)
-	case "cpp", "c", "h", "go", "rs":
+	case "cpp", "c", "h", "rs":
 		return "\033[0;95m" // Light Magenta (compiled language source)
 	default:
 		return "\033[0m" // Default color
