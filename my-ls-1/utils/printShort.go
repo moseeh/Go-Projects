@@ -3,9 +3,6 @@ package utils
 import (
 	"fmt"
 	"math"
-	"os"
-	"path/filepath"
-	"strings"
 	"syscall"
 	"unsafe"
 
@@ -34,28 +31,11 @@ func GetTerminalWidth() (int, error) {
 	return int(ws.Col), nil
 }
 
-// Function to determine if a file is executable
-func isExecutable(mode os.FileMode) bool {
-	return mode&0o111 != 0
-}
-
-// Function to check if a file is an image based on extension
-func isImage(fileName string) bool {
-	ext := strings.ToLower(filepath.Ext(fileName))
-	imageExtensions := []string{".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg"}
-	for _, imgExt := range imageExtensions {
-		if ext == imgExt {
-			return true
-		}
-	}
-	return false
-}
-
 func printShortFormat(entries []models.FileInfo, indent string) {
 	// Get the terminal width
 	termWidth, err := GetTerminalWidth()
 	if err != nil {
-		termWidth = 80
+		termWidth = 80 // Default terminal width
 	}
 
 	// Function to calculate total width given column widths
@@ -89,7 +69,7 @@ func printShortFormat(entries []models.FileInfo, indent string) {
 		}
 	}
 
-	// Recalculate final layout with optimal number of columns
+	// Recalculate final layout with the optimal number of columns
 	numRows := int(math.Ceil(float64(len(entries)) / float64(optimalCols)))
 	colWidths := make([]int, optimalCols)
 	for i, entry := range entries {
@@ -103,21 +83,17 @@ func printShortFormat(entries []models.FileInfo, indent string) {
 			index := col*numRows + row
 			if index < len(entries) {
 				entry := entries[index]
-				if entry.IsDir {
-					// Blue for directories
-					fmt.Printf("%s\033[38;2;0;120;255m%-*s\033[0m", indent, colWidths[col]+2, entry.Name)
-				} else if isImage(entry.Name) {
-					// Magenta for image files
-					fmt.Printf("%s\033[38;2;255;0;255m%-*s\033[0m", indent, colWidths[col]+2, entry.Name)
-				} else if isExecutable(entry.Mode) {
-					// Green for executable files
-					fmt.Printf("%s\033[38;2;0;255;0m%-*s\033[0m", indent, colWidths[col]+2, entry.Name)
-				} else {
-					// Default color for other files
-					fmt.Printf("%s%-*s", indent, colWidths[col]+2, entry.Name)
-				}
+
+				// Get the color for the current file
+				color := getFileColor(entry.Mode, entry.Name)
+
+				// Print the file name with the corresponding color, ensuring the background color stays behind the text only
+				fmt.Printf("%s%s%-*s\033[0m", indent, color, colWidths[col], entry.Name)
+
+				// Add spacing between columns
+				fmt.Printf("  ") // Two spaces between columns for better readability
 			}
 		}
-		fmt.Println()
+		fmt.Println() // Move to the next row after printing a full row
 	}
 }
