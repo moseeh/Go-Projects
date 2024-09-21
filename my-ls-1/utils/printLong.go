@@ -7,7 +7,7 @@ import (
 	"my-ls-1/models"
 )
 
-func printLongFormat(entries []models.FileInfo, indent string) {
+func printLongFormat(entries []models.FileInfo) {
 	var totalBlocks int64
 	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
 
@@ -21,7 +21,7 @@ func printLongFormat(entries []models.FileInfo, indent string) {
 		groupLen = max(groupLen, len(entry.Group))
 	}
 
-	fmt.Printf("%stotal %d\n", indent, totalBlocks)
+	fmt.Printf("total %d\n", totalBlocks)
 
 	for _, entry := range entries {
 		modeStr := entry.Mode.String()
@@ -30,8 +30,8 @@ func printLongFormat(entries []models.FileInfo, indent string) {
 		timeStr := entry.ModTime.Format("Jan _2 15:04")
 		color := getFileColor(entry.Mode, entry.Name)
 
-		fmt.Printf("%s%-11s %*s %-*s %-*s %*s %s %s%s\033[0m\n",
-			indent, modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
+		fmt.Printf("%-11s %*s %-*s %-*s %*s %s %s%s\033[0m\n",
+			modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
 			sizeLen, size, timeStr, color, entry.Name)
 	}
 }
