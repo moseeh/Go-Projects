@@ -10,7 +10,7 @@ import (
 	"my-ls-1/models"
 )
 
-func ListDir(path string, options models.Options, indent string) error {
+func ListDir(path string, options models.Options) error {
 	fileInfo, err := os.Stat(path)
 	if err != nil {
 		return err
@@ -81,17 +81,17 @@ func ListDir(path string, options models.Options, indent string) error {
 	sortEntries(fileInfos, options)
 
 	if options.Long {
-		printLongFormat(fileInfos, indent)
+		printLongFormat(fileInfos)
 	} else {
-		printShortFormat(fileInfos, indent)
+		printShortFormat(fileInfos)
 	}
 
 	if options.Recursive {
 		for _, info := range fileInfos {
 			if info.IsDir && info.Name != "." && info.Name != ".." && (options.All || !strings.HasPrefix(info.Name, ".")) {
 				fullPath := filepath.Join(path, info.Name)
-				fmt.Printf("\n%s%s:\n", indent, fullPath)
-				err := ListDir(fullPath, options, indent+"  ")
+				fmt.Printf("\n%s:\n", fullPath)
+				err := ListDir(fullPath, options)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "my-ls: %v\n", err)
 				}
