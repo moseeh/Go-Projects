@@ -12,7 +12,7 @@ func printLongFormat(entries []models.FileInfo) {
 	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
 
 	for _, entry := range entries {
-		totalBlocks += (entry.Size + 1023) / 1024 // Round up to the nearest 1024 bytes
+		totalBlocks += (entry.Size + 4095) / 4096 * 4 
 		size := strconv.FormatInt(entry.Size, 10)
 		linkCount := strconv.Itoa(entry.Links)
 		sizeLen = max(sizeLen, len(size))
@@ -20,9 +20,7 @@ func printLongFormat(entries []models.FileInfo) {
 		userLen = max(userLen, len(entry.User))
 		groupLen = max(groupLen, len(entry.Group))
 	}
-	if len(entries) > 1 {
-		fmt.Printf("total %d\n", totalBlocks)
-	}
+	fmt.Printf("total %d\n", totalBlocks)
 
 	for _, entry := range entries {
 		modeStr := entry.Mode.String()
