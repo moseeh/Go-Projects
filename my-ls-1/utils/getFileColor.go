@@ -5,59 +5,60 @@ import (
 	"strings"
 )
 
+var lsColors map[string]string
+
+func init() {
+	lsColors = parseLSColors(os.Getenv("LS_COLORS"))
+}
+
+func parseLSColors(lsColorsEnv string) map[string]string {
+	colors := make(map[string]string)
+	pairs := strings.Split(lsColorsEnv, ":")
+	for _, pair := range pairs {
+		parts := strings.Split(pair, "=")
+		if len(parts) == 2 {
+			colors[parts[0]] = "\033[" + parts[1] + "m"
+		}
+	}
+	return colors
+}
+
 func getFileColor(mode os.FileMode, fileName string) string {
 	switch {
 	case mode&os.ModeDir != 0:
 		if mode&0o002 != 0 && mode&0o010 != 0 {
-			return "\033[42;30m" // Black on Green background (directory, writable by others, with sticky bit)
+			return lsColors["tw"] // Directory, writable by others, with sticky bit
 		}
 		if mode&0o002 != 0 {
-			return "\033[43;30m" // Black on Yellow background (directory, writable by others)
+			return lsColors["ow"] // Directory, writable by others
 		}
-		return "\033[1;34m" // Bold Blue (directory)
+		return lsColors["di"] // Directory
 	case mode&os.ModeSymlink != 0:
-		return "\033[1;36m" // Bold Cyan (symlink)
+		return lsColors["ln"] // Symlink
 	case mode&os.ModeNamedPipe != 0:
-		return "\033[40;33m" // Yellow on Black background (named pipe)
+		return lsColors["pi"] // Named pipe
 	case mode&os.ModeSocket != 0:
-		return "\033[1;35m" // Bold Magenta (socket)
+		return lsColors["so"] // Socket
 	case mode&os.ModeDevice != 0:
-		return "\033[1;33;40m" // Bold Yellow on Black background (device file)
+		return lsColors["bd"] // Block device
 	case mode&os.ModeCharDevice != 0:
-		return "\033[1;33;40m" // Bold Yellow on Black background (character device)
+		return lsColors["cd"] // Character device
 	case mode&os.ModeSetuid != 0:
-		return "\033[37;41m" // White on Red background (setuid)
+		return lsColors["su"] // Setuid
 	case mode&os.ModeSetgid != 0:
-		return "\033[30;46m" // Black on Cyan background (setgid)
+		return lsColors["sg"] // Setgid
 	case mode&0o111 != 0:
-		return "\033[1;32m" // Bold Green (executable)
+		return lsColors["ex"] // Executable
 	default:
-		// Check for common file extensions
 		return getColorByExtension(strings.ToLower(getFileExtension(fileName)))
 	}
 }
 
 func getColorByExtension(ext string) string {
-	switch ext {
-	case "gz", "tar", "zip", "rar", "7z":
-		return "\033[1;31m" // Bold Red (compressed file)
-	case "jpg", "jpeg", "gif", "bmp", "png", "svg":
-		return "\033[1;35m" // Bold Magenta (image file)
-	case "mp3", "wav", "flac":
-		return "\033[1;36m" // Bold Cyan (audio file)
-	case "mp4", "mkv", "avi", "mov":
-		return "\033[1;33m" // Bold Yellow (video file)
-	case "pdf", "epub", "mobi":
-		return "\033[0;33m" // Yellow (document file)
-	case "sh", "bash", "zsh", "fish":
-		return "\033[0;32m" // Green (shell script)
-	case "py", "rb", "pl", "php":
-		return "\033[0;34m" // Blue (interpreted language script)
-	case "cpp", "c", "h", "rs":
-		return "\033[0;95m" // Light Magenta (compiled language source)
-	default:
-		return "\033[0m" // Default color
+	if color, ok := lsColors["*."+ext]; ok {
+		return color
 	}
+	return lsColors["rs"] // Default color
 }
 
 func getFileExtension(name string) string {
