@@ -20,8 +20,9 @@ func printLongFormat(entries []models.FileInfo) {
 		userLen = max(userLen, len(entry.User))
 		groupLen = max(groupLen, len(entry.Group))
 	}
-
-	fmt.Printf("total %d\n", totalBlocks)
+	if len(entries) > 1 {
+		fmt.Printf("total %d\n", totalBlocks)
+	}
 
 	for _, entry := range entries {
 		modeStr := entry.Mode.String()
