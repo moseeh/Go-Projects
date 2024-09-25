@@ -19,7 +19,7 @@ func ListDir(path string, options models.Options) error {
 		// If it's a file, just print its info and return
 		fileInfos := []models.FileInfo{getFileInfo(path, fileInfo, options)}
 		if options.Long {
-			printLongFormat(fileInfos)
+			printLongFormat(fileInfos, path)
 		} else {
 			printShortFormat(fileInfos)
 		}
@@ -35,7 +35,7 @@ func ListDir(path string, options models.Options) error {
 	sortEntries(fileInfos, options)
 
 	if options.Long {
-		printLongFormat(fileInfos)
+		printLongFormat(fileInfos, path)
 	} else {
 		printShortFormat(fileInfos)
 	}
