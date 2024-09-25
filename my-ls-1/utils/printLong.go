@@ -11,6 +11,7 @@ import (
 func printLongFormat(entries []models.FileInfo, path string) {
 	var totalBlocks int64
 	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
+	devLen := 8 // For displaying major, minor as " 123,  456"
 
 	for _, entry := range entries {
 		totalBlocks += (entry.Size + 4095) / 4096 * 4
@@ -24,15 +25,24 @@ func printLongFormat(entries []models.FileInfo, path string) {
 	fmt.Printf("total %d\n", totalBlocks)
 
 	for _, entry := range entries {
-		modeStr := entry.Mode.String()
+		modeStr := modeToString(entry.Mode)
 		linkCount := strconv.Itoa(entry.Links)
 		size := strconv.FormatInt(entry.Size, 10)
 		timeStr := entry.ModTime.Format("Jan _2 15:04")
 		color := getFileColor(entry.Mode, entry.Name)
 
-		fmt.Printf("%-11s %*s %-*s %-*s %*s %s %s%s\033[0m",
-			modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
-			sizeLen, size, timeStr, color, entry.Name)
+		if entry.Mode&os.ModeCharDevice != 0 { // Check if it's a character device
+			stat := getDeviceStat(path + "/" + entry.Name)
+			major, minor := majorMinor(stat.Rdev)
+			// Align major/minor numbers within fixed-width column (e.g., " 123,  456")
+			fmt.Printf("%-10s  %*s %-*s %-*s %*d, %*d %s %s%s\033[0m",
+				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
+				3, major, 3, minor, timeStr, color, entry.Name)
+		} else {
+			fmt.Printf("%-10s  %*s %-*s %-*s %*s %s %s%s\033[0m",
+				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
+				max(sizeLen, devLen), size, timeStr, color, entry.Name)
+		}
 
 		if entry.Mode&os.ModeSymlink != 0 {
 			target, err := os.Readlink(path + "/" + entry.Name)
@@ -45,7 +55,6 @@ func printLongFormat(entries []models.FileInfo, path string) {
 				}
 				fmt.Printf(" -> %s%s\033[0m", targetColor, target)
 			}
-
 		}
 
 		fmt.Println()
