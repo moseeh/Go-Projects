@@ -2,17 +2,18 @@ package utils
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"my-ls-1/models"
 )
 
-func printLongFormat(entries []models.FileInfo) {
+func printLongFormat(entries []models.FileInfo, path string) {
 	var totalBlocks int64
 	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
 
 	for _, entry := range entries {
-		totalBlocks += (entry.Size + 4095) / 4096 * 4 
+		totalBlocks += (entry.Size + 4095) / 4096 * 4
 		size := strconv.FormatInt(entry.Size, 10)
 		linkCount := strconv.Itoa(entry.Links)
 		sizeLen = max(sizeLen, len(size))
@@ -29,9 +30,19 @@ func printLongFormat(entries []models.FileInfo) {
 		timeStr := entry.ModTime.Format("Jan _2 15:04")
 		color := getFileColor(entry.Mode, entry.Name)
 
-		fmt.Printf("%-11s %*s %-*s %-*s %*s %s %s%s\033[0m\n",
+		fmt.Printf("%-11s %*s %-*s %-*s %*s %s %s%s\033[0m",
 			modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
 			sizeLen, size, timeStr, color, entry.Name)
+
+		if entry.Mode&os.ModeSymlink != 0 {
+			target, err := os.Readlink(path + "/" + entry.Name)
+			if err == nil {
+				fmt.Printf(" -> %s", target)
+			}
+
+		}
+
+		fmt.Println()
 	}
 }
 
