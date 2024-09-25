@@ -37,7 +37,13 @@ func printLongFormat(entries []models.FileInfo, path string) {
 		if entry.Mode&os.ModeSymlink != 0 {
 			target, err := os.Readlink(path + "/" + entry.Name)
 			if err == nil {
-				fmt.Printf(" -> %s", target)
+				targetColor := ""
+				info, err := os.Stat(target)
+				if err == nil {
+					mod := info.Mode()
+					targetColor = getFileColor(mod, target)
+				}
+				fmt.Printf(" -> %s%s\033[0m", targetColor, target)
 			}
 
 		}
