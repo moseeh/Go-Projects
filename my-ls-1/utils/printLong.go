@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"my-ls-1/models"
 )
@@ -44,18 +45,16 @@ func printLongFormat(entries []models.FileInfo, path string, files bool) {
 		modeStr := modeToString(entry.Mode)
 		linkCount := strconv.Itoa(entry.Links)
 		size := strconv.FormatInt(entry.Size, 10)
-		timeStr := entry.ModTime.Format("Jan _2 15:04")
+		timeStr := formatTime(entry.ModTime)
 		color := getFileColor(entry.Mode, entry.Name)
 
-		if entry.Mode&os.ModeCharDevice != 0 || entry.Mode&os.ModeDevice != 0 { // Check for device files
+		if entry.Mode&os.ModeCharDevice != 0 || entry.Mode&os.ModeDevice != 0 {
 			stat := getDeviceStat(path + "/" + entry.Name)
 			major, minor := majorMinor(stat.Rdev)
-			// Align major/minor numbers within the same column width as file sizes
 			fmt.Printf("%-10s %*s %-*s %-*s %*d, %*d %s %s%s\033[0m",
 				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
 				majorLen, major, minorLen, minor, timeStr, color, entry.Name)
 		} else {
-			// For regular files, use the size length calculated earlier
 			fmt.Printf("%-10s %*s %-*s %-*s %*s %s %s%s\033[0m",
 				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
 				sizeLen, size, timeStr, color, entry.Name)
@@ -74,7 +73,6 @@ func printLongFormat(entries []models.FileInfo, path string, files bool) {
 				fmt.Printf(" -> %s%s\033[0m", targetColor, target)
 			}
 		}
-
 		fmt.Println()
 	}
 }
@@ -84,4 +82,15 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func formatTime(t time.Time) string {
+	now := time.Now()
+	sixMonthsAgo := now.AddDate(0, -6, 0)
+
+	if t.After(sixMonthsAgo) {
+		return t.Format("Jan _2 15:04")
+	} else {
+		return t.Format("Jan _2  2006")
+	}
 }
