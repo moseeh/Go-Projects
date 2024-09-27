@@ -33,7 +33,7 @@ func main() {
 	files = false
 
 	for i, path := range newPaths {
-		if i == 0 && len(path) > 1 {
+		if i == 0 && len(paths) > 1 {
 			fmt.Println()
 		}
 		if i > 0 {
