@@ -10,8 +10,7 @@ import (
 
 func printLongFormat(entries []models.FileInfo, path string, files bool) {
 	var totalBlocks int64
-	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
-	devLen := 8 // For displaying major, minor as " 123,  456"
+	sizeLen, linkLen, userLen, groupLen, majorLen, minorLen := 0, 0, 0, 0, 0, 0
 
 	// First pass: calculate the max lengths for size, link, user, group, and major/minor device numbers
 	for _, entry := range entries {
@@ -27,11 +26,14 @@ func printLongFormat(entries []models.FileInfo, path string, files bool) {
 		if entry.Mode&os.ModeCharDevice != 0 || entry.Mode&os.ModeDevice != 0 {
 			stat := getDeviceStat(path + "/" + entry.Name)
 			major, minor := majorMinor(stat.Rdev)
-			devLen = max(devLen, len(strconv.Itoa(int(major)))+len(strconv.Itoa(int(minor)))) // for " major, minor"
+			a := len(strconv.Itoa(int(major))) + len(strconv.Itoa(int(minor))) + 2
+			if a >= sizeLen {
+				sizeLen = a
+				majorLen = len(strconv.Itoa(int(major)))
+				minorLen = len(strconv.Itoa(int(minor)))
+			}
 		}
 	}
-	// Ensure sizeLen accounts for either the normal file size or the device major/minor size
-	sizeLen = max(sizeLen, devLen)
 
 	if !files {
 		fmt.Printf("total %d\n", totalBlocks)
@@ -51,7 +53,7 @@ func printLongFormat(entries []models.FileInfo, path string, files bool) {
 			// Align major/minor numbers within the same column width as file sizes
 			fmt.Printf("%-10s %*s %-*s %-*s %*d, %*d %s %s%s\033[0m",
 				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
-				3, major, 3, minor, timeStr, color, entry.Name)
+				majorLen, major, minorLen, minor, timeStr, color, entry.Name)
 		} else {
 			// For regular files, use the size length calculated earlier
 			fmt.Printf("%-10s %*s %-*s %-*s %*s %s %s%s\033[0m",
