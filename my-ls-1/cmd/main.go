@@ -13,15 +13,36 @@ func main() {
 		paths = []string{"."}
 	}
 	utils.SortPath(paths)
+	newPaths := []string{}
+	files := false
+	for _, path := range paths {
+		fileinfo, err := os.Stat(path)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
+		}
+		if fileinfo.IsDir() {
+			newPaths = append(newPaths, path)
+		} else {
+			files = true
+			err := utils.ListDir(path, options, files)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
+			}
+		}
+	}
+	files = false
 
-	for i, path := range paths {
+	for i, path := range newPaths {
+		if i == 0 && len(path) > 1 {
+			fmt.Println()
+		}
 		if i > 0 {
 			fmt.Println()
 		}
 		if len(paths) > 1 {
 			fmt.Printf("%s:\n", path)
 		}
-		err := utils.ListDir(path, options)
+		err := utils.ListDir(path, options, files)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
 		}
