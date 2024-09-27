@@ -10,14 +10,17 @@ import (
 )
 
 func ListDir(path string, options models.Options) error {
-	fileInfo, err := os.Stat(path)
+	// Use filepath.Clean to handle '.' and '..' but preserve multiple slashes
+	cleanPath := filepath.Clean(path)
+
+	fileInfo, err := os.Stat(cleanPath)
 	if err != nil {
 		return err
 	}
 
 	if !fileInfo.IsDir() {
 		// If it's a file, just print its info and return
-		fileInfos := []models.FileInfo{getFileInfo(path, fileInfo, options)}
+		fileInfos := []models.FileInfo{getFileInfo(cleanPath, fileInfo, options)}
 		if options.Long {
 			printLongFormat(fileInfos, path)
 		} else {
@@ -26,12 +29,12 @@ func ListDir(path string, options models.Options) error {
 		return nil
 	}
 
-	entries, err := os.ReadDir(path)
+	entries, err := os.ReadDir(cleanPath)
 	if err != nil {
 		return err
 	}
 
-	fileInfos := getFileInfos(path, entries, options)
+	fileInfos := getFileInfos(cleanPath, entries, options)
 	sortEntries(fileInfos, options)
 
 	if options.Long {
@@ -43,7 +46,9 @@ func ListDir(path string, options models.Options) error {
 	if options.Recursive {
 		for _, info := range fileInfos {
 			if info.IsDir && info.Name != "." && info.Name != ".." && (options.All || !strings.HasPrefix(info.Name, ".")) {
-				fullPath := filepath.Join(path, info.Name)
+				// Use strings.TrimSuffix to remove trailing slash if present, then add it back
+				// This preserves multiple slashes in the middle of the path
+				fullPath := strings.TrimSuffix(path, "/") + "/" + info.Name
 				fmt.Printf("\n%s:\n", fullPath)
 				err := ListDir(fullPath, options)
 				if err != nil {
