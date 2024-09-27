@@ -9,7 +9,7 @@ import (
 	"my-ls-1/models"
 )
 
-func ListDir(path string, options models.Options) error {
+func ListDir(path string, options models.Options, files bool) error {
 	// Use filepath.Clean to handle '.' and '..' but preserve multiple slashes
 	cleanPath := filepath.Clean(path)
 
@@ -22,7 +22,7 @@ func ListDir(path string, options models.Options) error {
 		// If it's a file, just print its info and return
 		fileInfos := []models.FileInfo{getFileInfo(cleanPath, fileInfo, options)}
 		if options.Long {
-			printLongFormat(fileInfos, path)
+			printLongFormat(fileInfos, path, files)
 		} else {
 			printShortFormat(fileInfos)
 		}
@@ -38,7 +38,7 @@ func ListDir(path string, options models.Options) error {
 	sortEntries(fileInfos, options)
 
 	if options.Long {
-		printLongFormat(fileInfos, path)
+		printLongFormat(fileInfos, path, files)
 	} else {
 		printShortFormat(fileInfos)
 	}
@@ -50,7 +50,7 @@ func ListDir(path string, options models.Options) error {
 				// This preserves multiple slashes in the middle of the path
 				fullPath := strings.TrimSuffix(path, "/") + "/" + info.Name
 				fmt.Printf("\n%s:\n", fullPath)
-				err := ListDir(fullPath, options)
+				err := ListDir(fullPath, options, files)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "my-ls: %v\n", err)
 				}
