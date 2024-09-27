@@ -8,7 +8,7 @@ import (
 	"my-ls-1/models"
 )
 
-func printLongFormat(entries []models.FileInfo, path string) {
+func printLongFormat(entries []models.FileInfo, path string, files bool) {
 	var totalBlocks int64
 	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
 	devLen := 8 // For displaying major, minor as " 123,  456"
@@ -33,8 +33,9 @@ func printLongFormat(entries []models.FileInfo, path string) {
 	// Ensure sizeLen accounts for either the normal file size or the device major/minor size
 	sizeLen = max(sizeLen, devLen)
 
-	// Print total blocks
-	fmt.Printf("total %d\n", totalBlocks)
+	if !files {
+		fmt.Printf("total %d\n", totalBlocks)
+	}
 
 	// Second pass: print the actual entries
 	for _, entry := range entries {
