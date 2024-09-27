@@ -13,6 +13,7 @@ func printLongFormat(entries []models.FileInfo, path string) {
 	sizeLen, linkLen, userLen, groupLen := 0, 0, 0, 0
 	devLen := 8 // For displaying major, minor as " 123,  456"
 
+	// First pass: calculate the max lengths for size, link, user, group, and major/minor device numbers
 	for _, entry := range entries {
 		totalBlocks += (entry.Size + 4095) / 4096 * 4
 		size := strconv.FormatInt(entry.Size, 10)
@@ -21,9 +22,21 @@ func printLongFormat(entries []models.FileInfo, path string) {
 		linkLen = max(linkLen, len(linkCount))
 		userLen = max(userLen, len(entry.User))
 		groupLen = max(groupLen, len(entry.Group))
+
+		// Check for device files and calculate their major/minor lengths
+		if entry.Mode&os.ModeCharDevice != 0 || entry.Mode&os.ModeDevice != 0 {
+			stat := getDeviceStat(path + "/" + entry.Name)
+			major, minor := majorMinor(stat.Rdev)
+			devLen = max(devLen, len(strconv.Itoa(int(major)))+len(strconv.Itoa(int(minor)))) // for " major, minor"
+		}
 	}
+	// Ensure sizeLen accounts for either the normal file size or the device major/minor size
+	sizeLen = max(sizeLen, devLen)
+
+	// Print total blocks
 	fmt.Printf("total %d\n", totalBlocks)
 
+	// Second pass: print the actual entries
 	for _, entry := range entries {
 		modeStr := modeToString(entry.Mode)
 		linkCount := strconv.Itoa(entry.Links)
@@ -31,19 +44,21 @@ func printLongFormat(entries []models.FileInfo, path string) {
 		timeStr := entry.ModTime.Format("Jan _2 15:04")
 		color := getFileColor(entry.Mode, entry.Name)
 
-		if entry.Mode&os.ModeCharDevice != 0 { // Check if it's a character device
+		if entry.Mode&os.ModeCharDevice != 0 || entry.Mode&os.ModeDevice != 0 { // Check for device files
 			stat := getDeviceStat(path + "/" + entry.Name)
 			major, minor := majorMinor(stat.Rdev)
-			// Align major/minor numbers within fixed-width column (e.g., " 123,  456")
-			fmt.Printf("%-10s  %*s %-*s %-*s %*d, %*d %s %s%s\033[0m",
+			// Align major/minor numbers within the same column width as file sizes
+			fmt.Printf("%-10s %*s %-*s %-*s %*d, %*d %s %s%s\033[0m",
 				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
 				3, major, 3, minor, timeStr, color, entry.Name)
 		} else {
-			fmt.Printf("%-10s  %*s %-*s %-*s %*s %s %s%s\033[0m",
+			// For regular files, use the size length calculated earlier
+			fmt.Printf("%-10s %*s %-*s %-*s %*s %s %s%s\033[0m",
 				modeStr, linkLen, linkCount, userLen, entry.User, groupLen, entry.Group,
-				max(sizeLen, devLen), size, timeStr, color, entry.Name)
+				sizeLen, size, timeStr, color, entry.Name)
 		}
 
+		// If it's a symlink, print the target
 		if entry.Mode&os.ModeSymlink != 0 {
 			target, err := os.Readlink(path + "/" + entry.Name)
 			if err == nil {
