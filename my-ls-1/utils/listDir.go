@@ -38,18 +38,21 @@ func ListDir(path string, options models.Options, files bool) error {
 	sortEntries(fileInfos, options)
 
 	if options.Long {
+		if options.Recursive {
+			fmt.Printf("\n%s:\n", path)
+		}
 		printLongFormat(fileInfos, path, files)
 	} else {
+		if options.Recursive {
+			fmt.Printf("\n%s:\n", path)
+		}
 		printShortFormat(fileInfos)
 	}
 
 	if options.Recursive {
 		for _, info := range fileInfos {
 			if info.IsDir && info.Name != "." && info.Name != ".." && (options.All || !strings.HasPrefix(info.Name, ".")) {
-				// Use strings.TrimSuffix to remove trailing slash if present, then add it back
-				// This preserves multiple slashes in the middle of the path
 				fullPath := strings.TrimSuffix(path, "/") + "/" + info.Name
-				fmt.Printf("\n%s:\n", fullPath)
 				err := ListDir(fullPath, options, files)
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "my-ls: %v\n", err)
