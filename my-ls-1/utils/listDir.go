@@ -3,24 +3,20 @@ package utils
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"my-ls-1/models"
 )
 
 func ListDir(path string, options models.Options, files bool) error {
-	// Use filepath.Clean to handle '.' and '..' but preserve multiple slashes
-	cleanPath := filepath.Clean(path)
-
-	fileInfo, err := os.Stat(cleanPath)
+	fileInfo, err := os.Stat(path)
 	if err != nil {
 		return err
 	}
 
 	if !fileInfo.IsDir() {
 		// If it's a file, just print its info and return
-		fileInfos := []models.FileInfo{getFileInfo(cleanPath, fileInfo, options)}
+		fileInfos := []models.FileInfo{getFileInfo(path, fileInfo, options)}
 		if options.Long {
 			printLongFormat(fileInfos, path, files)
 		} else {
@@ -29,12 +25,12 @@ func ListDir(path string, options models.Options, files bool) error {
 		return nil
 	}
 
-	entries, err := os.ReadDir(cleanPath)
+	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
 
-	fileInfos := getFileInfos(cleanPath, entries, options)
+	fileInfos := getFileInfos(path, entries, options)
 	sortEntries(fileInfos, options)
 
 	if options.Long {
