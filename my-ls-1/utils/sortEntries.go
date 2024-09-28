@@ -60,11 +60,20 @@ func lsLess(a, b string) bool {
 	} else {
 		bLower = strings.ToLower(b)
 	}
-
-	if aLower != bLower {
-		return aLower > bLower
+	aComp, bComp := "", ""
+	for _, v := range aLower {
+		if (v >= 'a' && v <= 'z') || (v >= '0' && v <= '9') {
+			aComp += string(v)
+		}
 	}
-
+	for _, v := range bLower {
+		if (v >= 'a' && v <= 'z') || (v >= '0' && v <= '9') {
+			bComp += string(v)
+		}
+	}
+	if aComp != bComp {
+		return aComp > bComp
+	}
 	// If both names are equal lexicographically, compare the original case-sensitive names
 	return a > b
 }
