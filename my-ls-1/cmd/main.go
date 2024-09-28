@@ -19,6 +19,7 @@ func main() {
 		fileinfo, err := os.Stat(path)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
+			return
 		}
 		if fileinfo.IsDir() {
 			newPaths = append(newPaths, path)
@@ -27,6 +28,7 @@ func main() {
 			err := utils.ListDir(path, options, files)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
+				return
 			}
 		}
 	}
@@ -45,6 +47,7 @@ func main() {
 		err := utils.ListDir(path, options, files)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
+			return
 		}
 	}
 }
