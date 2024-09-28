@@ -9,7 +9,7 @@ import (
 )
 
 func ListDir(path string, options models.Options, files bool) error {
-	fileInfo, err := os.Stat(path)
+	fileInfo, err := os.Lstat(path)
 	if err != nil {
 		return err
 	}
