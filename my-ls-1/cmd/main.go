@@ -16,7 +16,7 @@ func main() {
 	newPaths := []string{}
 	files := false
 	for _, path := range paths {
-		fileinfo, err := os.Stat(path)
+		fileinfo, err := os.Lstat(path)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
 			return
