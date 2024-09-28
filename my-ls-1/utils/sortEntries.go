@@ -43,37 +43,33 @@ func shouldSwap(a, b models.FileInfo, options models.Options) bool {
 	return lsLess(a.Name, b.Name)
 }
 
-// lsLess mimics the ls command's lexicographical ordering
 func lsLess(a, b string) bool {
-	aDot := strings.HasPrefix(a, ".")
-	bDot := strings.HasPrefix(b, ".")
-	aLower, bLower := "", ""
-
-	if aDot {
-		aLower = strings.ToLower(a[1:])
-	} else {
-		aLower = strings.ToLower(a)
-	}
-
-	if bDot {
-		bLower = strings.ToLower(b[1:])
-	} else {
-		bLower = strings.ToLower(b)
-	}
-	aComp, bComp := "", ""
-	for _, v := range aLower {
-		if (v >= 'a' && v <= 'z') || (v >= '0' && v <= '9') {
-			aComp += string(v)
+	// Helper function to get normalized strings without non-alphanumeric characters.
+	normalize := func(s string) string {
+		start := 1
+		if s[0] != '.' { // Skip the first character only if it's a dot.
+			start = 0
 		}
-	}
-	for _, v := range bLower {
-		if (v >= 'a' && v <= 'z') || (v >= '0' && v <= '9') {
-			bComp += string(v)
+		var builder strings.Builder
+		for _, v := range s[start:] {
+			if ('a' <= v && v <= 'z') || ('0' <= v && v <= '9') {
+				builder.WriteRune(v)
+			} else if 'A' <= v && v <= 'Z' {
+				// Convert uppercase to lowercase
+				builder.WriteRune(v + 32)
+			}
 		}
+		return builder.String()
 	}
+
+	// Normalize both strings for comparison.
+	aComp := normalize(a)
+	bComp := normalize(b)
+
 	if aComp != bComp {
 		return aComp > bComp
 	}
-	// If both names are equal lexicographically, compare the original case-sensitive names
+
+	// If normalized names are equal, fall back to the original case-sensitive comparison.
 	return a > b
 }
