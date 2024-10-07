@@ -1,167 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Concert Compass</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/styles.css">
-</head>
-<body>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="loading-content">
+        <h1>Welcome to Concert Compass</h1>
+        <p>Tuning the strings of musical discovery...</p>
+        <div class="loading-spinner">
+          <i class="fas fa-music fa-spin"></i>
+        </div>
+      </div>
+    </div>
     <div class="container">
-        <header>
-            <h1>Concert Compass</h1>
-            <div class="intro">
-                <p>✨ Embark on a musical journey with Concert Compass! Discover artists, explore genres, and find your next favorite concert. Let the rhythm guide you to unforgettable experiences. 🎵🌟</p>
-            </div>
-        </header>
-
+      <header>
+        <div class="header-content">
+        <h1>Concert Compass</h1>
         <div class="search-container">
             <form id="searchForm" onsubmit="return false;">
-                <input type="text" id="searchInput" placeholder="Search artists..." oninput="filterArtists()">
-                <button type="button" onclick="filterArtists()">
-                    <i class="fas fa-search"></i>
-                    Search
-                </button>
+              <input
+                type="text"
+                id="searchInput"
+                placeholder="Search artists..."
+                oninput="filterArtists()"
+              />
+              <button type="button" onclick="filterArtists()">
+                <i class="fas fa-search"></i>
+                Search
+              </button>
             </form>
+          </div>
+      </header>
+      <div class="intro-container">
+        <div class="intro">
+          <p>
+            ✨ Embark on a musical journey with Concert Compass! Discover
+            artists, explore genres, and find your next favorite concert. Let
+            the rhythm guide you to unforgettable experiences. 🎵🌟
+          </p>
         </div>
+      </div>
+      </div>
+      <div id="artists" class="artists">
+        {{range .}}
+        <div class="card-grid" data-name="{{.Name}}">
+          <h2>{{.Name}}</h2>
+          <div class="image">
+            <img src="{{.Image}}" alt="Image of {{.Name}}" loading="lazy" />
+          </div>
+          <p><strong>Creation Date:</strong> {{.CreationDate}}</p>
+          <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
+          <p>
+            <strong>Details:</strong>
+            <a href="/locations/{{.Id}}">View Details →</a>
+          </p>
+        </div>
+        {{end}}
+      </div>
 
-        <div id="artists" class="artists">
-            {{range .}}
-            <div class="card-grid" data-name="{{.Name}}">
-                <h2>{{.Name}}</h2>
-                <div class="image">
-                    <img src="{{.Image}}" alt="Image of {{.Name}}" loading="lazy">
-                </div>
-                <p><strong>Creation Date:</strong> {{.CreationDate}}</p>
-                <p><strong>First Album:</strong> {{.FirstAlbum}}</p>
-                <p><strong>Details:</strong> <a href="/locations/{{.Id}}">View Details →</a></p>
-            </div>
-            {{end}}
+      <div class="pagination">
+        <div class="pagination-controls">
+          <button id="firstPage" onclick="goToPage('first')">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button id="prevPage" onclick="goToPage('prev')">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <span class="page-info">
+            Page <span id="currentPage">1</span> of
+            <span id="totalPages">1</span>
+          </span>
+          <button id="nextPage" onclick="goToPage('next')">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button id="lastPage" onclick="goToPage('last')">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
         </div>
-
-        <div class="pagination">
-            <div class="pagination-controls">
-                <button id="firstPage" onclick="goToPage('first')">
-                    <i class="fas fa-angle-double-left"></i>
-                </button>
-                <button id="prevPage" onclick="goToPage('prev')">
-                    <i class="fas fa-angle-left"></i>
-                </button>
-                <span class="page-info">
-                    Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
-                </span>
-                <button id="nextPage" onclick="goToPage('next')">
-                    <i class="fas fa-angle-right"></i>
-                </button>
-                <button id="lastPage" onclick="goToPage('last')">
-                    <i class="fas fa-angle-double-right"></i>
-                </button>
-            </div>
-            <div class="items-per-page">
-                <select id="itemsPerPage" onchange="updateItemsPerPage()">
-                    <option value="6">6 per page</option>
-                    <option value="12" selected>12 per page</option>
-                    <option value="24">24 per page</option>
-                </select>
-            </div>
+        <div class="items-per-page">
+          <select id="itemsPerPage" onchange="updateItemsPerPage()">
+            <option value="6">6 per page</option>
+            <option value="12" selected>12 per page</option>
+            <option value="24">24 per page</option>
+          </select>
         </div>
+      </div>
     </div>
 
     <script>
-        let currentPage = 1;
-        let itemsPerPage = 12;
-        let filteredCards = [];
+      let currentPage = 1;
+      let itemsPerPage = 12;
+      let filteredCards = [];
 
-        function initializePagination() {
-            const artistCards = document.querySelectorAll('.card-grid');
-            filteredCards = Array.from(artistCards);
-            updatePagination();
+      function initializePagination() {
+        const artistCards = document.querySelectorAll(".card-grid");
+        filteredCards = Array.from(artistCards);
+
+        currentPage = 1; // Set the initial page to 1
+        updatePagination();
+      }
+
+      function updatePagination() {
+        const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+        document.getElementById("currentPage").textContent = currentPage;
+        document.getElementById("totalPages").textContent = totalPages;
+
+        document.getElementById("firstPage").disabled = currentPage === 1;
+        document.getElementById("prevPage").disabled = currentPage === 1;
+        document.getElementById("nextPage").disabled =
+          currentPage === totalPages;
+        document.getElementById("lastPage").disabled =
+          currentPage === totalPages;
+
+        // Show only the cards for the current page
+        filteredCards.forEach((card, index) => {
+          const shouldShow =
+            index >= (currentPage - 1) * itemsPerPage &&
+            index < currentPage * itemsPerPage;
+          card.style.display = shouldShow ? "" : "none";
+        });
+      }
+
+      function goToPage(action) {
+        const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+
+        switch (action) {
+          case "first":
+            currentPage = 1;
+            break;
+          case "prev":
+            currentPage = Math.max(1, currentPage - 1);
+            break;
+          case "next":
+            currentPage = Math.min(totalPages, currentPage + 1);
+            break;
+          case "last":
+            currentPage = totalPages;
+            break;
         }
 
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-            document.getElementById('currentPage').textContent = currentPage;
-            document.getElementById('totalPages').textContent = totalPages;
-            
-            document.getElementById('firstPage').disabled = currentPage === 1;
-            document.getElementById('prevPage').disabled = currentPage === 1;
-            document.getElementById('nextPage').disabled = currentPage === totalPages;
-            document.getElementById('lastPage').disabled = currentPage === totalPages;
+        updatePagination();
+      }
 
-            // Show only the cards for the current page
-            filteredCards.forEach((card, index) => {
-                const shouldShow = index >= (currentPage - 1) * itemsPerPage && 
-                                  index < currentPage * itemsPerPage;
-                card.style.display = shouldShow ? '' : 'none';
-            });
-        }
+      function updateItemsPerPage() {
+        itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
+        currentPage = 1;
+        updatePagination();
+      }
 
-        function goToPage(action) {
-            const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-            
-            switch(action) {
-                case 'first':
-                    currentPage = 1;
-                    break;
-                case 'prev':
-                    currentPage = Math.max(1, currentPage - 1);
-                    break;
-                case 'next':
-                    currentPage = Math.min(totalPages, currentPage + 1);
-                    break;
-                case 'last':
-                    currentPage = totalPages;
-                    break;
+      function filterArtists() {
+        const searchInput = document.getElementById("searchInput");
+        const filter = searchInput.value.toLowerCase();
+        const artistCards = document.querySelectorAll(".card-grid");
+
+        filteredCards = Array.from(artistCards).filter((card) => {
+          const artistName = card.getAttribute("data-name").toLowerCase();
+          return artistName.includes(filter);
+        });
+
+        currentPage = 1;
+        updatePagination();
+      }
+      function initializeKeyboardNavigation() {
+        const gridItems = document.querySelectorAll(".card-grid");
+        let currentFocusIndex = -1;
+
+        // Function to focus on a grid item
+        function focusGridItem(index) {
+          // Remove focus from all items
+          gridItems.forEach((item) => item.setAttribute("tabindex", "-1"));
+
+          // Ensure index is within bounds
+          if (index >= 0 && index < gridItems.length) {
+            const targetItem = gridItems[index];
+
+            // Only focus visible items
+            if (targetItem.style.display !== "none") {
+              targetItem.setAttribute("tabindex", "0");
+              targetItem.focus();
+              currentFocusIndex = index;
+
+              // If the focused item is not in the current page, go to its page
+              const itemPage = Math.floor(index / itemsPerPage) + 1;
+              if (itemPage !== currentPage) {
+                currentPage = itemPage;
+                updatePagination();
+              }
             }
-            
-            updatePagination();
+          }
         }
 
-        function updateItemsPerPage() {
-            itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
-            currentPage = 1;
-            updatePagination();
-        }
+        // Add tabindex to all grid items
+        gridItems.forEach((item, index) => {
+          item.setAttribute("tabindex", "-1");
 
-        function filterArtists() {
-            const searchInput = document.getElementById('searchInput');
-            const filter = searchInput.value.toLowerCase();
-            const artistCards = document.querySelectorAll('.card-grid');
-            
-            filteredCards = Array.from(artistCards).filter(card => {
-                const artistName = card.getAttribute('data-name').toLowerCase();
-                return artistName.includes(filter);
-            });
-            
-            currentPage = 1;
-            updatePagination();
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initializePagination();
+          // Add click listener to update currentFocusIndex
+          item.addEventListener("click", () => {
+            currentFocusIndex = index;
+          });
         });
-        function filterArtists() {
-            const searchInput = document.getElementById('searchInput');
-            const filter = searchInput.value.toLowerCase();
-            const artistCards = document.querySelectorAll('.card-grid');
 
-            artistCards.forEach(card => {
-                const artistName = card.getAttribute('data-name').toLowerCase();
-                if (artistName.includes(filter)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+        // Add keyboard event listener to the document
+        document.addEventListener("keydown", (e) => {
+          // Only handle keyboard navigation when not in an input field
+          if (e.target.tagName === "INPUT") return;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const artistCards = document.querySelectorAll('.card-grid');
-            artistCards.forEach(card => {
-                card.style.display = '';
-            });
+          const visibleItems = Array.from(gridItems).filter(
+            (item) => item.style.display !== "none"
+          );
+          const itemsPerRow = Math.floor(
+            document.querySelector(".artists").offsetWidth /
+              gridItems[0].offsetWidth
+          );
+
+          switch (e.key) {
+            case "ArrowRight":
+              e.preventDefault();
+              if (currentFocusIndex === -1) {
+                focusGridItem(0);
+              } else {
+                focusGridItem(currentFocusIndex + 1);
+              }
+              break;
+            case "ArrowLeft":
+              e.preventDefault();
+              if (currentFocusIndex > 0) {
+                focusGridItem(currentFocusIndex - 1);
+              }
+              break;
+            case "ArrowDown":
+              e.preventDefault();
+              if (currentFocusIndex === -1) {
+                focusGridItem(0);
+              } else {
+                focusGridItem(currentFocusIndex + itemsPerRow);
+              }
+              break;
+            case "ArrowUp":
+              e.preventDefault();
+              if (currentFocusIndex >= itemsPerRow) {
+                focusGridItem(currentFocusIndex - itemsPerRow);
+              }
+              break;
+            case "Enter":
+              if (currentFocusIndex !== -1) {
+                const link = gridItems[currentFocusIndex].querySelector("a");
+                if (link) link.click();
+              }
+              break;
+          }
         });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const loadingScreen = document.getElementById("loading-screen");
+        const container = document.querySelector(".container");
+        // Simulate loading time (you can adjust this based on your actual data fetching)
+        setTimeout(() => {
+          loadingScreen.style.opacity = "0";
+          container.style.opacity = "1";
+          setTimeout(() => {
+            loadingScreen.style.display = "none";
+          }, 500); // This matches the transition time
+        }, 2000); // Adjust this time as needed
+        initializePagination();
+        initializeKeyboardNavigation();
+      });
+
+      function filterArtists() {
+        const searchInput = document.getElementById("searchInput");
+        const filter = searchInput.value.toLowerCase();
+        const artistCards = document.querySelectorAll(".card-grid");
+
+        artistCards.forEach((card) => {
+          const artistName = card.getAttribute("data-name").toLowerCase();
+          if (artistName.includes(filter)) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const artistCards = document.querySelectorAll(".card-grid");
+        artistCards.forEach((card) => {
+          card.style.display = "";
+        });
+      });
     </script>
-</body>
+  </body>
 </html>
