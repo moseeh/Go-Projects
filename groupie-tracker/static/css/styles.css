@@ -12,53 +12,125 @@ body {
     line-height: 1.6;
 }
 
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease-out;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-content h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+    color: #e44d26;
+}
+
+.loading-content p {
+    font-size: 1.2em;
+    margin-bottom: 1em;
+}
+
+.loading-spinner {
+    font-size: 2em;
+    color: #e44d26;
+}
+
 .container {
-    max-width: 1200px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+
+.container {
     margin: 0 auto;
     padding: 20px;
 }
 
 /* Header styles */
 header {
+    display: flex;
+    justify-content: space-between;
     text-align: center;
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    padding: 10px 20px;
+    background-color: #121212;
 }
-
+.header-content {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
 h1 {
-    color: #ff4081;
-    font-size: clamp(2.5em, 5vw, 4em);
+    color: #e44d26;
+    font-size: 5;
     font-family: 'Montserrat', sans-serif;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Vibrant welcome message */
-.intro {
-    max-width: 800px;
+.intro-container {
+    width: 103%;
+    overflow: hidden;
     margin: 0 auto 40px;
+    padding: 0 20px;
+}
+
+/* Vibrant welcome message with animation */
+.intro {
+    margin: 0;
     padding: 20px;
-    background: linear-gradient(45deg, #ff4081 0%, #66bb6a 100%);
-    border-radius: 15px;
+    background: linear-gradient(45deg, #e44d26 0%, #66bb6a 100%);
+    border-radius: 30px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     transform: translateY(0);
-    transition: transform 0.3s ease;
+    transition: transform 0.6s ease;
+    animation: moveIntro 15s linear infinite alternate;
 }
 
 .intro:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
+    animation-play-state: paused;
 }
 
 .intro p {
     color: white;
     font-size: 1.2em;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    white-space: nowrap;
+}
+
+@keyframes moveIntro {
+    0% {
+        transform: translateX(50%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Optional: Add responsive adjustments */
+@media (max-width: 768px) {
+    .intro p {
+        white-space: normal;
+    }
+    .intro {
+        animation: none;
+    }
 }
 
 /* Search form styles */
 .search-container {
-    margin: 40px auto;
-    max-width: 800px;
+    margin-left: auto;
 }
 
 form {
@@ -70,8 +142,8 @@ form {
 
 input[type="text"] {
     flex: 1;
-    min-width: 200px;
-    padding: 12px 20px;
+    min-width: 100px;
+    padding: 12px 30px;
     border: 2px solid #333;
     border-radius: 8px;
     background-color: #1e1e1e;
@@ -81,7 +153,7 @@ input[type="text"] {
 
 button {
     padding: 12px 25px;
-    background-color: #ff4081;
+    background-color: #e44d26;
     border: none;
     border-radius: 8px;
     color: white;
@@ -112,9 +184,19 @@ button:hover {
     border-radius: 12px;
     padding: 20px;
     transition: all 0.3s ease;
+    position: relative;
+    transition: all 0.2s ease;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    
 }
-
+.card-grid:focus {
+    outline: 3px solid #e44d26;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+.card-grid:focus-visible {
+    transform: scale(1.02);
+}
 .card-grid:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.2);
@@ -131,7 +213,7 @@ h2 {
     color: #ffffff;
     font-size: 1.5em;
     margin-bottom: 15px;
-    border-bottom: 2px solid #ff4081;
+    border-bottom: 2px solid #e44d26;
     padding-bottom: 8px;
 }
 
@@ -140,7 +222,7 @@ h2 {
 }
 
 a {
-    color: #ff4081;
+    color: #e44d26;
     text-decoration: none;
     transition: all 0.3s ease;
     display: inline-block;
@@ -169,8 +251,8 @@ a:hover {
 }
 
 .pagination button:hover:not(:disabled) {
-    background-color: #ff4081;
-    border-color: #ff4081;
+    background-color: #e44d26;
+    border-color: #e44d26;
 }
 
 .pagination button:disabled {
