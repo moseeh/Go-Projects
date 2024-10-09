@@ -180,7 +180,7 @@ button:hover {
 .artists {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px;
+  gap: 20px;
   margin-top: 0px;
 }
 
