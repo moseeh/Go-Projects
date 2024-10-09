@@ -1,154 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Band and Tour Details</title>
-<style>
-body {
-    background-color: #121212;
-    font-family: 'Roboto', sans-serif;
-    margin: 20px;
-    color: #e0e0e0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-h1, h2 {
-    color: #e44d26;
-    font-family: 'Montserrat', sans-serif;
-    margin-top: 20px;
-}
-.band-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-    width: 100%;
-    max-width: 1100px;
-    margin-bottom: 30px;
-}
-.artist-info {
-    text-align: left;
-}
-.artist-info img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-.members-list {
-    list-style-type: none;
-    padding: 0;
-}
-.members-list li {
-    margin-bottom: 10px;
-}
-.table-container {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-    background-color: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(5px);
-    border-radius: 8px;
-    padding: 20px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    color: #ffffff;
-}
-th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-th {
-    background-color:  #e44d26;
-    color: white;
-}
-.members-list li {
-    margin-bottom: 10px;
-    padding-left: 20px;
-    position: relative;
-}
-.members-list li::before {
-    content: "•";
-    color:  #e44d26;
-    position: absolute;
-    left: 0;
-    font-size: 1.2em;
-}
-tr:last-child td {
-    border-bottom: none;
-}
-tr:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-.past-concert {
-    color: rgba(255, 255, 255, 0.6);
-}
-.legend {
-    margin-top: 10px;
-    font-style: italic;
-    color: rgba(255, 255, 255, 0.7);
-    text-align: center;
-}
-@media (max-width: 768px) {
-    .band-info {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-</head>
-<body>
-<div class="band-info">
-    {{ if .Artist }}
-    <div class="artist-info">
-        <img src="{{ .Artist.Image }}" alt="Image of {{ .Artist.Name }}">
-        <h1>{{ .Artist.Name }}</h1>
-    </div>
-    {{ end }}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Band and Tour Details</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #1a1a1a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
 
-    {{ if .Artist.Members }}
-    <div class="members-info">
+      .loading-content {
+        text-align: center;
+        color: white;
+      }
+
+      .loading-content h1 {
+        font-size: 2.5em;
+        margin-bottom: 0.5em;
+        color: #e44d26;
+      }
+
+      .loading-content p {
+        font-size: 1.2em;
+        margin-bottom: 1em;
+      }
+
+      .loading-spinner {
+        font-size: 2em;
+        color: #e44d26;
+      }
+      body {
+        background-color: #121212;
+        font-family: "Roboto", sans-serif;
+        margin: 20px;
+        color: #e0e0e0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h1,
+      h2 {
+        color: #e44d26;
+        font-family: "Montserrat", sans-serif;
+        margin-top: 20px;
+      }
+      .band-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+        width: 100%;
+        max-width: 1100px;
+        margin-bottom: 30px;
+      }
+      .artist-info {
+        text-align: left;
+      }
+      .artist-info img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+      }
+      .members-list {
+        list-style-type: none;
+        padding: 0;
+      }
+      .members-list li {
+        margin-bottom: 10px;
+      }
+      .table-container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(5px);
+        border-radius: 8px;
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #ffffff;
+      }
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      th {
+        background-color: #e44d26;
+        color: white;
+      }
+      .members-list li {
+        margin-bottom: 10px;
+        padding-left: 20px;
+        position: relative;
+      }
+      .members-list li::before {
+        content: "•";
+        color: #e44d26;
+        position: absolute;
+        left: 0;
+        font-size: 1.2em;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .past-concert {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .legend {
+        margin-top: 10px;
+        font-style: italic;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+      }
+      @media (max-width: 768px) {
+        .band-info {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="loading-screen">
+      <div class="loading-content">
+        <h1>Band and Tour Details</h1>
+        <p>preparing band info...</p>
+        <div class="loading-spinner">
+          <i class="fas fa-music fa-spin"></i>
+        </div>
+      </div>
+    </div>
+    <div class="band-info">
+      {{ if .Artist }}
+      <div class="artist-info">
+        <img src="{{ .Artist.Image }}" alt="Image of {{ .Artist.Name }}" />
+        <h1>{{ .Artist.Name }}</h1>
+      </div>
+      {{ end }} {{ if .Artist.Members }}
+      <div class="members-info">
         <h2>Band Members</h2>
         <ul class="members-list">
-            {{ range .Artist.Members }}
-            <li>{{ . }}</li>
-            {{ end }}
+          {{ range .Artist.Members }}
+          <li>{{ . }}</li>
+          {{ end }}
         </ul>
+      </div>
+      {{ end }}
     </div>
-    {{ end }}
-</div>
 
-{{ if .Relations.DatesLocations }}
-<div class="table-container">
-    <h2>Tour Dates and Locations</h2>
-    <table>
+    {{ if .Relations.DatesLocations }}
+    <div class="table-container">
+      <h2>Tour Dates and Locations</h2>
+      <table>
         <thead>
-            <tr>
-                <th>Location</th>
-                <th>Dates</th>
-            </tr>
+          <tr>
+            <th>Location</th>
+            <th>Dates</th>
+          </tr>
         </thead>
         <tbody>
-            {{ range $location, $dates := .Relations.DatesLocations }}
-            <tr>
-                <td>{{ $location }}</td>
-                <td>
-                    {{ range $dates }}
-                    <div>{{ . }}</div>
-                    {{ end }}
-                </td>
-            </tr>
-            {{ end }}
+          {{ range $location, $dates := .Relations.DatesLocations }}
+          <tr>
+            <td>{{ $location }}</td>
+            <td>
+              {{ range $dates }}
+              <div>{{ . }}</div>
+              {{ end }}
+            </td>
+          </tr>
+          {{ end }}
         </tbody>
-    </table>
-</div>
+      </table>
+    </div>
+    <script src="../static/js/script.js"></script>
 
-{{ else }}
-<p>No tour information available.</p>
-{{ end }}
-
-</body>
+    {{ else }}
+    <p>No tour information available.</p>
+    {{ end }}
+  </body>
 </html>
