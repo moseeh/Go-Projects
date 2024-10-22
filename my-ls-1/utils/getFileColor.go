@@ -5,12 +5,15 @@ import (
 	"strings"
 )
 
+// lsColors is a global variable that stores color mappings based on the `LS_COLORS` environment variable.
 var lsColors map[string]string
 
+// init initializes the `lsColors` map by parsing the `LS_COLORS` environment variable.
 func init() {
 	lsColors = parseLSColors(os.Getenv("LS_COLORS"))
 }
 
+// parseLSColors parses the `LS_COLORS` environment variable and returns a map of file types/extensions to color codes.
 func parseLSColors(lsColorsEnv string) map[string]string {
 	colors := make(map[string]string)
 	pairs := strings.Split(lsColorsEnv, ":")
@@ -23,6 +26,8 @@ func parseLSColors(lsColorsEnv string) map[string]string {
 	return colors
 }
 
+// getFileColor returns the appropriate color code for a given file based on its mode and name.
+// It checks for file type and permissions to select the correct color mapping.
 func getFileColor(mode os.FileMode, fileName string) string {
 	switch {
 	case mode&os.ModeDir != 0:
@@ -54,6 +59,8 @@ func getFileColor(mode os.FileMode, fileName string) string {
 	}
 }
 
+// getColorByExtension returns the color code for a given file extension.
+// If the extension is not found in the `lsColors` map, it returns the default color.
 func getColorByExtension(ext string) string {
 	if color, ok := lsColors["*."+ext]; ok {
 		return color
@@ -61,6 +68,8 @@ func getColorByExtension(ext string) string {
 	return lsColors["rs"] // Default color
 }
 
+// getFileExtension extracts and returns the file extension from the given file name.
+// If no extension is found, it returns an empty string.
 func getFileExtension(name string) string {
 	parts := strings.Split(name, ".")
 	if len(parts) > 1 {
