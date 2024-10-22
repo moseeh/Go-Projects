@@ -6,6 +6,7 @@ import (
 	"my-ls-1/models"
 )
 
+// sort entries of a directory using the specified flags
 func sortEntries(entries []models.FileInfo, options models.Options) {
 	n := len(entries)
 	for i := 0; i < n-1; i++ {
