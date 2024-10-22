@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"my-ls-1/utils"
 )
@@ -18,6 +19,10 @@ func main() {
 	for _, path := range paths {
 		fileinfo, err := os.Lstat(path)
 		if err != nil {
+			if strings.HasPrefix(path, "-") {
+				fmt.Printf("my-ls: invalid option\n")
+				return
+			}
 			fmt.Fprintf(os.Stderr, "my-ls: %s: %v\n", path, err)
 			return
 		}
