@@ -9,13 +9,14 @@ import (
 	"my-ls-1/models"
 )
 
+// print entries in the long format when -l flag is used
 func printLongFormat(entries []models.FileInfo, path string, files bool) {
 	var totalBlocks int64
 	sizeLen, linkLen, userLen, groupLen, majorLen, minorLen := 0, 0, 0, 0, 0, 0
 
 	// First pass: calculate the max lengths for size, link, user, group, and major/minor device numbers
 	for _, entry := range entries {
-		totalBlocks += (entry.Size + 4095) / 4096 * 4
+		totalBlocks += entry.BlockSize / 2
 		size := strconv.FormatInt(entry.Size, 10)
 		linkCount := strconv.Itoa(entry.Links)
 		sizeLen = max(sizeLen, len(size))
@@ -66,7 +67,7 @@ func printLongFormat(entries []models.FileInfo, path string, files bool) {
 				target, err := os.Readlink(path)
 				if err == nil {
 					targetColor := ""
-					info, err := os.Stat(target)
+					info, err := os.Lstat(target)
 					if err == nil {
 						mod := info.Mode()
 						targetColor = getFileColor(mod, target)
@@ -78,7 +79,7 @@ func printLongFormat(entries []models.FileInfo, path string, files bool) {
 				target, err := os.Readlink(path + "/" + entry.Name)
 				if err == nil {
 					targetColor := ""
-					info, err := os.Stat(target)
+					info, err := os.Lstat(target)
 					if err == nil {
 						mod := info.Mode()
 						targetColor = getFileColor(mod, target)
