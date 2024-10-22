@@ -3,40 +3,15 @@ package utils
 import (
 	"fmt"
 	"math"
-	"syscall"
-	"unsafe"
 
 	"my-ls-1/models"
 )
 
-// Winsize struct to store terminal window size
-type Winsize struct {
-	Row    uint16
-	Col    uint16
-	Xpixel uint16
-	Ypixel uint16
-}
-
-// GetTerminalWidth returns the width of the terminal in characters
-func GetTerminalWidth() (int, error) {
-	ws := &Winsize{}
-	_, _, err := syscall.Syscall(syscall.SYS_IOCTL,
-		uintptr(syscall.Stdin),
-		uintptr(syscall.TIOCGWINSZ),
-		uintptr(unsafe.Pointer(ws)),
-	)
-	if err != 0 {
-		return 0, err
-	}
-	return int(ws.Col), nil
-}
-
+// printShortFormat prints the entries in a short format with columns
 func printShortFormat(entries []models.FileInfo) {
-	// Get the terminal width
-	termWidth, err := GetTerminalWidth()
-	if err != nil {
-		termWidth = 80 // Default terminal width
-	}
+	// Use a fixed terminal width of 80 characters
+
+	const termWidth = 205
 
 	// Function to calculate total width given column widths
 	totalWidth := func(widths []int) int {
@@ -87,7 +62,7 @@ func printShortFormat(entries []models.FileInfo) {
 				// Get the color for the current file
 				color := getFileColor(entry.Mode, entry.Name)
 
-				// Print the file name with the corresponding color, ensuring the background color stays behind the text only
+				// Print the file name with the corresponding color
 				fmt.Printf("%s%-*s\033[0m", color, colWidths[col], entry.Name)
 
 				// Add spacing between columns
