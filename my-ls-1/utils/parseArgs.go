@@ -6,9 +6,10 @@ import (
 	"my-ls-1/models"
 )
 
+// check command line arguments for flags and paths
 func ParseArgs(args []string) (models.Options, []string) {
 	var options models.Options
-	var paths []string
+	paths := []string{}
 
 	for _, arg := range args {
 		if strings.HasPrefix(arg, "-") {
@@ -26,6 +27,8 @@ func ParseArgs(args []string) (models.Options, []string) {
 						options.Reverse = true
 					case 't':
 						options.SortByTime = true
+					default:
+						paths = append(paths, arg)
 					}
 				}
 			} else {
