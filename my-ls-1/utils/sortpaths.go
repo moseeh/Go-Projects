@@ -1,5 +1,6 @@
 package utils
 
+// sort the command line paths listed
 func SortPath(arr []string) {
 	n := len(arr)
 	for i := 0; i < n; i++ {
