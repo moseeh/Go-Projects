@@ -7,7 +7,7 @@ import (
 
 	"my-ls-1/models"
 )
-
+// list directoty entries using the specified flags
 func ListDir(path string, options models.Options, files bool) error {
 	fileInfo, err := os.Lstat(path)
 	if err != nil {
