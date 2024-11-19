@@ -83,9 +83,7 @@ func broadcastMessage(name, msg string) {
 
 	models.ClientsMutex.Lock()
 	defer models.ClientsMutex.Unlock()
-	for n, c := range models.Clients {
-		if n != name {
-			fmt.Fprint(c, formattedMsg)
-		}
+	for _, c := range models.Clients {
+		fmt.Fprint(c, formattedMsg)
 	}
 }
