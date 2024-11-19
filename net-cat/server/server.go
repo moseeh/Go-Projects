@@ -73,17 +73,17 @@ func (s *newServer) handleMessages(name string, conn net.Conn) {
 			continue
 		}
 
-		broadcastMessage(name, msg)
+		timestamp := time.Now().Format("2006-01-02 15:04:05")
+		formattedMsg := fmt.Sprintf("[%s][%s]: %s", timestamp, name, msg)
+
+		broadcastMessage(formattedMsg)
 	}
 }
 
-func broadcastMessage(name, msg string) {
-	timestamp := time.Now().Format("2006-01-02 15:04:05")
-	formattedMsg := fmt.Sprintf("[%s][%s]: %s", timestamp, name, msg)
-
+func broadcastMessage(msg string) {
 	models.ClientsMutex.Lock()
 	defer models.ClientsMutex.Unlock()
 	for _, c := range models.Clients {
-		fmt.Fprint(c, formattedMsg)
+		fmt.Fprint(c, msg)
 	}
 }
