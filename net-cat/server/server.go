@@ -49,7 +49,9 @@ func (s *newServer) handleConnection(conn net.Conn) {
 		fmt.Println("Error getting client name:", err)
 		return
 	}
-
+	for _, v := range s.Prevchat {
+		conn.Write([]byte(v))
+	}
 	// Add the client to the chat
 	client.AddClient(name, conn)
 	defer client.RemoveClient(name)
@@ -75,6 +77,7 @@ func (s *newServer) handleMessages(name string, conn net.Conn) {
 
 		timestamp := time.Now().Format("2006-01-02 15:04:05")
 		formattedMsg := fmt.Sprintf("[%s][%s]: %s", timestamp, name, msg)
+		s.Prevchat = append(s.Prevchat, formattedMsg)
 
 		broadcastMessage(formattedMsg)
 	}
