@@ -63,12 +63,22 @@ func (s *newServer) handleConnection(conn net.Conn) {
 	// Send welcome logo
 	conn.Write(utils.ReadLogo())
 
-	// Get client name
-	name, err := client.GetClientName(conn)
-	if err != nil {
-		fmt.Println("Error getting client name:", err)
-		conn.Write([]byte("Failed to retrieve your name. Disconnecting.\n"))
-		return
+	// Get client name and validate uniqueness
+	var name string
+	for {
+		tempName, err := client.GetClientName(conn)
+		if err != nil {
+			fmt.Println("Error getting client name:", err)
+			conn.Write([]byte("Failed to retrieve your name. Disconnecting.\n"))
+			return
+		}
+
+		if err := client.AddClient(tempName, conn); err != nil {
+			conn.Write([]byte("Name already in use. Please choose a different name:\n"))
+		} else {
+			name = tempName
+			break
+		}
 	}
 
 	// Send previous chat history
@@ -78,11 +88,8 @@ func (s *newServer) handleConnection(conn net.Conn) {
 	}
 	s.mu.Unlock()
 
-	// Add client to the chat
-	client.AddClient(name, conn)
-	defer client.RemoveClient(name)
-
 	fmt.Printf("%s has joined the chat.\n", name)
+	defer client.RemoveClient(name)
 
 	// Handle messages from the client
 	s.handleMessages(name, conn)
