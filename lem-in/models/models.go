@@ -17,3 +17,10 @@ type Room struct {
 type Path struct {
 	Rooms []string
 }
+
+type Ant struct {
+	ID      int
+	Room    string
+	Path    []string
+	PathIdx int
+}
