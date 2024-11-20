@@ -18,5 +18,6 @@ func main() {
 		return
 	}
 	paths := utils.FindPaths(Antcolony)
+	fmt.Println(paths)
 	fmt.Println(utils.FilterPaths(paths, Antcolony))
 }
