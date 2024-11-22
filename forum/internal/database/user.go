@@ -68,3 +68,27 @@ func (ur *UserRepository) CreateUser(user *User) error {
 	user.ID = int(id)
 	return nil
 }
+
+// getUserByUsername retrieves a user from the database by username
+func (ur *UserRepository) GetUserByUsername(username string) (*User, error) {
+	user := &User{}
+	query := "SELECT id, username, email, password_hash, fullname FROM users WHERE username = ?"
+
+	err := ur.DB.QueryRow(query, username).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.PasswordHash,
+		&user.Fullname,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
