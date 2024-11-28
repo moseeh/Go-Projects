@@ -7,27 +7,27 @@ import (
 	"net/http"
 )
 
-func GetDates(url string) (Date, error) {
+func GetDates(url string) ([]Date, error) {
 	response, err := http.Get(url)
 	if err != nil {
-		return Date{}, fmt.Errorf("error making HTTP request: %w", err)
+		return nil, fmt.Errorf("error making HTTP request: %w", err)
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
-		return Date{}, fmt.Errorf("unexpected status code: %d", response.StatusCode)
+		return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
 	}
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return Date{}, fmt.Errorf("error reading response body: %w", err)
+		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
-	var dates Date
-	err = json.Unmarshal(bodyBytes, &dates)
+	var dateIndex DateIndex
+	err = json.Unmarshal(bodyBytes, &dateIndex)
 	if err != nil {
-		return Date{}, fmt.Errorf("error unmarshaling JSON: %w", err)
+		return nil, fmt.Errorf("error unmarshaling JSON: %w", err)
 	}
 
-	return dates, nil
+	return dateIndex.Index, nil
 }

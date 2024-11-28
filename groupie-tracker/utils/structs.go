@@ -7,7 +7,7 @@ type ApiIndex struct {
 	Relation  string `json:"relation"`
 }
 
-type Artist struct {
+type Artists struct {
 	Id           int      `json:"id"`
 	Image        string   `json:"image"`
 	Name         string   `json:"name"`
@@ -23,21 +23,26 @@ type Location struct {
 	Id        int      `json:"id"`
 	Locations []string `json:"locations"`
 	Dates     string   `json:"dates"`
+	Name      string
 }
 
+type LocationIndex struct {
+	Index []Location `json:"index"`
+}
 
 type Date struct {
 	Id    int      `json:"id"`
 	Dates []string `json:"dates"`
+	Name  string
 }
 
-
-
-type RelationIndex struct {
-	Index []Relations
+type DateIndex struct {
+	Index []Date `json:"index"`
 }
-
 type Relations struct {
 	ID             int                 `json:"id"`
 	DatesLocations map[string][]string `json:"datesLocations"`
+}
+type RelationsIndex struct {
+	Index []Relations `json:"index"`
 }

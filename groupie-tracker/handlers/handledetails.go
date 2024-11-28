@@ -1,50 +1,39 @@
 package handlers
 
 import (
-	"groupie-tracker/utils"
 	"net/http"
 	"strconv"
 	"strings"
 	"text/template"
+
+	"groupie-tracker/utils"
 )
 
-func LocationHandler(w http.ResponseWriter, r *http.Request) {
+func DetailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL and validate
-	idStr := strings.TrimPrefix(r.URL.Path, "/locations/")
+	idStr := strings.TrimPrefix(r.URL.Path, "/details/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil || id < 1 || id > 52 {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
-		return
-	}
-
-	// Fetch locations
-	locations, err := utils.GetLocations(utils.GetApiIndex().Locations + "/" + strconv.Itoa(id))
-	if err != nil {
-		http.Error(w, "Error fetching locations", http.StatusInternalServerError)
+		// http.Error(w, "Invalid ID", http.StatusBadRequest)
+		ErrorHandler(w, r, http.StatusBadRequest)
 		return
 	}
 
 	// Fetch relations
 	relations, err := utils.GetRelations(utils.GetApiIndex().Relation + "/" + strconv.Itoa(id))
 	if err != nil {
-		http.Error(w, "Error fetching relations", http.StatusInternalServerError)
-		return
-	}
-
-	// Fetch dates
-	dates, err := utils.GetDates(locations.Dates)
-	if err != nil {
-		http.Error(w, "Error fetching dates", http.StatusInternalServerError)
+		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
 
 	// Fetch artists
 	artists, err := utils.GetArtists(utils.GetApiIndex().Artists)
 	if err != nil {
-		http.Error(w, "Error fetching artists", http.StatusInternalServerError)
+		ErrorHandler(w, r, http.StatusInternalServerError)
+		return
 	}
 	if id > len(artists) {
-		http.Error(w, "Artist not found", http.StatusNotFound)
+		ErrorHandler(w, r, http.StatusNotFound)
 		return
 	}
 
@@ -56,31 +45,27 @@ func LocationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Artist    utils.Artist
-		Locations utils.Location
-		Dates     utils.Date
+		Artist    utils.Artists
 		Relations utils.Relations
 	}{
 		Artist:    artists[id-1],
-		Locations: locations,
-		Dates:     dates,
 		Relations: utils.Relations{DatesLocations: formattedLocations},
 	}
 
 	// Parse template
-	tmpl, err := template.New("locations.html").Funcs(template.FuncMap{
+	tmpl, err := template.New("details.html").Funcs(template.FuncMap{
 		"hasPrefix":  strings.HasPrefix,
 		"trimPrefix": strings.TrimPrefix,
-	}).ParseFiles("templates/locations.html")
+	}).ParseFiles("templates/details.html")
 	if err != nil {
-		http.Error(w, "Error parsing template", http.StatusInternalServerError)
+		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
 
 	// Execute template
 	err = tmpl.Execute(w, data)
 	if err != nil {
-		http.Error(w, "Error executing template", http.StatusInternalServerError)
+		ErrorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
 }

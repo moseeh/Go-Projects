@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Groupie Tracker</title>
+  <link rel="stylesheet" href="/static/css/index.css" />
+  <link rel="icon" href="/static/img/fav.ico" type="image/x-icon" />
+</head>
+
+<body>
+  <!-- HTML -->
+  <header>
+    <nav class="header-container">
+      <div class="title-container">
+        <a href="/">Groupie Tracker</a>
+      </div>
+      <div class="controls-container">
+        <div class="search-container">
+          <input type="text" id="search-bar" placeholder="Search..." oninput="filterArtists()" autocomplete="off" />
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <div class="suggestions"></div>
+        </div>
+        <button class="filter-button" onclick="toggleFilters()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span>Filter</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="filter-container">
+    <form action="/filter" method="GET" class="filter-menu" id="filterMenu">
+
+      <div class="filter-option">
+        <label>Creation Date Range</label>
+        <div class="spanner">
+          <span id="creationDateStartValue" class="range-display">1950</span>
+          <span>TO</span>
+          <span id="creationDateEndValue" class="range-display">2024</span>
+        </div>
+        <div class="range-container">
+          <input type="range" name="creationDateStart" min="1950" max="2024" value="1950" />
+          <input type="range" name="creationDateEnd" min="1950" max="2024" value="2024" />
+        </div>
+      </div>
+
+      <div class="filter-option">
+        <label>First Album Range</label>
+        <div class="spanner">
+          <span id="firstAlbumStartValue" class="range-display">1950</span>
+          <span>TO</span>
+          <span id="firstAlbumEndValue" class="range-display">2024</span>
+        </div>
+        <div class="range-container">
+          <input type="range" name="firstAlbumStart" min="1950" max="2024" value="1950" />
+          <input type="range" name="firstAlbumEnd" min="1950" max="2024" value="2024" />
+        </div>
+      </div>
+
+      <!-- Number of Members -->
+      <div class="filter-option-checkbox">
+        <label>Number of Members</label>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" name="members1" />
+            <label for="members1">1</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members2" />
+            <label for="members2">2</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members3" />
+            <label for="members3">3</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members4" />
+            <label for="members4">4</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members5" />
+            <label for="members5">5</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members6" />
+            <label for="members6">6</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members7" />
+            <label for="members7">7</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" name="members8" />
+            <label for="members8">8</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="filter-option-location">
+        <label for="location">Location</label>
+        <input type="text" name="location" placeholder="Enter location" />
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-group">
+        <button class="apply-filters" type="submit">
+          Apply Filters
+        </button>
+        <button class="reset-filters" type="button">Reset Filters</button>
+      </div>
+    </form>
+  </div>
+  <main class="main container">
+    <div class="grid" id="artist-grid">
+      {{ if . }} {{ range . }}
+      <a href="/details/{{.Id}}" class="artist-card" data-id="{{.Id}}" data-name="{{.Name}}"
+        data-members="{{range $index, $member := .Members}}{{if $index}},{{end}}{{$member}}{{end}}"
+        data-locations="{{range $index, $location := .Locations}}{{if $index}},{{end}}{{$location}}{{end}}"
+        data-firstalbum="{{.FirstAlbum}}" data-creationdate="{{.CreationDate}}">
+        <img src="{{.Image}}" alt="{{.Name}}'s image" />
+        <h2>{{.Name}}</h2>
+        <div>
+          <p>First Album: {{.FirstAlbum}}</p>
+          <p>Creation Date: {{.CreationDate}}</p>
+        </div>
+      </a>
+      {{ end }} {{ else }}
+      <p>No results found.</p>
+      {{ end }}
+    </div>
+    <!-- Pagination Controls -->
+    <div class="pagination">
+      <button id="prev-page" onclick="changePage(-1)" disabled>
+        Previous
+      </button>
+      <span id="page-info"></span>
+      <button id="next-page" onclick="changePage(1)">Next</button>
+    </div>
+  </main>
+  <script src="../static/js/script.js"></script>
+</body>
+
+</html>

@@ -7,30 +7,25 @@ import (
 	"net/http"
 )
 
-func GetArtists(url string) ([]Artist, error) {
-	// Make HTTP request
-	response, err := http.Get(url)
+func GetArtists(artistsURL string) ([]Artists, error) {
+	resp, err := http.Get(artistsURL)
 	if err != nil {
-		return nil, fmt.Errorf("error making HTTP request: %w", err)
+		return nil, fmt.Errorf("failed to fetch artists: %w", err)
 	}
-	defer response.Body.Close()
+	defer resp.Body.Close()
 
-	// Check status code
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	// Read response body
-	bodyBytes, err := io.ReadAll(response.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("error reading response body: %w", err)
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
-	// Unmarshal JSON
-	var artists []Artist
-	err = json.Unmarshal(bodyBytes, &artists)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling JSON: %w", err)
+	var artists []Artists
+	if err := json.Unmarshal(data, &artists); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal JSON: %w", err)
 	}
 
 	return artists, nil

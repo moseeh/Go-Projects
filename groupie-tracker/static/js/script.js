@@ -1,200 +1,236 @@
-let currentPage = 1;
-let itemsPerPage = 12;
-let filteredCards = [];
-
-function initializePagination() {
-  const artistCards = document.querySelectorAll(".card-grid");
-  filteredCards = Array.from(artistCards);
-
-  currentPage = 1; // Set the initial page to 1
-  updatePagination();
-}
-
-function updatePagination() {
-  const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-  document.getElementById("currentPage").textContent = currentPage;
-  document.getElementById("totalPages").textContent = totalPages;
-
-  document.getElementById("firstPage").disabled = currentPage === 1;
-  document.getElementById("prevPage").disabled = currentPage === 1;
-  document.getElementById("nextPage").disabled =
-    currentPage === totalPages;
-  document.getElementById("lastPage").disabled =
-    currentPage === totalPages;
-
-  // Show only the cards for the current page
-  filteredCards.forEach((card, index) => {
-    const shouldShow =
-      index >= (currentPage - 1) * itemsPerPage &&
-      index < currentPage * itemsPerPage;
-    card.style.display = shouldShow ? "" : "none";
+const cardsPerPage = 18; // Number of artist cards per page
+let currentPage = 1; // Current page
+const artistCards = document.querySelectorAll(".artist-card");
+const totalPages = Math.ceil(artistCards.length / cardsPerPage);
+// Display the current page of artist cards
+const showPage = (page) => {
+  const start = (page - 1) * cardsPerPage;
+  const end = page * cardsPerPage;
+  artistCards.forEach((card, index) => {
+    card.style.display = index >= start && index < end ? "block" : "none";
   });
-}
-
-function goToPage(action) {
-  const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-
-  switch (action) {
-    case "first":
-      currentPage = 1;
-      break;
-    case "prev":
-      currentPage = Math.max(1, currentPage - 1);
-      break;
-    case "next":
-      currentPage = Math.min(totalPages, currentPage + 1);
-      break;
-    case "last":
-      currentPage = totalPages;
-      break;
+  document.getElementById(
+    "page-info"
+  ).textContent = `Page ${page} of ${totalPages}`;
+  document.getElementById("prev-page").disabled = page === 1;
+  document.getElementById("next-page").disabled = page === totalPages;
+};
+// Change page function (prev or next)
+const changePage = (direction) => {
+  currentPage += direction;
+  showPage(currentPage);
+};
+// Initially display the first page
+showPage(currentPage);
+const filterArtists = () => {
+  const searchQuery = document.getElementById("search-bar").value.toLowerCase();
+  const container = document.querySelector(".suggestions");
+  container.innerHTML = "";
+  if (searchQuery === "") {
+    container.style.display = "none";
+    showPage(currentPage);
+    return;
   }
-
-  updatePagination();
-}
-
-function updateItemsPerPage() {
-  itemsPerPage = parseInt(document.getElementById("itemsPerPage").value);
-  currentPage = 1;
-  updatePagination();
-}
-
-function filterArtists() {
-  const searchInput = document.getElementById("searchInput");
-  const filter = searchInput.value.toLowerCase();
-  const artistCards = document.querySelectorAll(".card-grid");
-
-  filteredCards = Array.from(artistCards).filter((card) => {
-    const artistName = card.getAttribute("data-name").toLowerCase();
-    return artistName.includes(filter);
-  });
-
-  currentPage = 1;
-  updatePagination();
-}
-function initializeKeyboardNavigation() {
-  const gridItems = document.querySelectorAll(".card-grid");
-  let currentFocusIndex = -1;
-
-  // Function to focus on a grid item
-  function focusGridItem(index) {
-    // Remove focus from all items
-    gridItems.forEach((item) => item.setAttribute("tabindex", "-1"));
-
-    // Ensure index is within bounds
-    if (index >= 0 && index < gridItems.length) {
-      const targetItem = gridItems[index];
-
-      // Only focus visible items
-      if (targetItem.style.display !== "none") {
-        targetItem.setAttribute("tabindex", "0");
-        targetItem.focus();
-        currentFocusIndex = index;
-
-        // If the focused item is not in the current page, go to its page
-        const itemPage = Math.floor(index / itemsPerPage) + 1;
-        if (itemPage !== currentPage) {
-          currentPage = itemPage;
-          updatePagination();
-        }
-      }
+  container.style.display = "block";
+  let suggestionsAdded = false;
+  artistCards.forEach((card) => {
+    const artistName = card.querySelector("h2").textContent;
+    const artistId = card.getAttribute("data-id");
+    const artistMembers = card
+      .getAttribute("data-members")
+      .split(",")
+      .map((member) => member.trim())
+      .filter((member) => member !== ""); // Filter out empty strings
+    const artistLocations = card
+      .getAttribute("data-locations")
+      .split(",")
+      .map((location) => location.trim())
+      .filter((location) => location !== ""); // Filter out empty strings
+    const artistFirstAlbum = card.getAttribute("data-firstalbum");
+    const artistCreationDate = card.getAttribute("data-creationdate");
+    // Check artist name
+    if (artistName.toLowerCase().includes(searchQuery)) {
+      createSuggestion(container, `${artistName} - artist/band`, artistId);
+      suggestionsAdded = true;
     }
-  }
-
-  // Add tabindex to all grid items
-  gridItems.forEach((item, index) => {
-    item.setAttribute("tabindex", "-1");
-
-    // Add click listener to update currentFocusIndex
-    item.addEventListener("click", () => {
-      currentFocusIndex = index;
+    // Check creation date
+    if (artistCreationDate.toLowerCase().includes(searchQuery)) {
+      createSuggestion(
+        container,
+        `${artistCreationDate} - creation date of ${artistName}`,
+        artistId
+      );
+      suggestionsAdded = true;
+    }
+    // Check first album
+    if (artistFirstAlbum.toLowerCase().includes(searchQuery)) {
+      createSuggestion(
+        container,
+        `${artistFirstAlbum} - first album of ${artistName}`,
+        artistId
+      );
+      suggestionsAdded = true;
+    }
+    // Check members
+    artistMembers.forEach((member) => {
+      if (member.toLowerCase().includes(searchQuery)) {
+        createSuggestion(
+          container,
+          `${member} - member of ${artistName}`,
+          artistId
+        );
+        suggestionsAdded = true;
+      }
+    });
+    // Check locations
+    artistLocations.forEach((location) => {
+      if (location.toLowerCase().includes(searchQuery)) {
+        createSuggestion(
+          container,
+          `${location} - location of ${artistName}`,
+          artistId
+        );
+        suggestionsAdded = true;
+      }
     });
   });
-
-  // Add keyboard event listener to the document
-  document.addEventListener("keydown", (e) => {
-    // Only handle keyboard navigation when not in an input field
-    if (e.target.tagName === "INPUT") return;
-
-    const visibleItems = Array.from(gridItems).filter(
-      (item) => item.style.display !== "none"
-    );
-    const itemsPerRow = Math.floor(
-      document.querySelector(".artists").offsetWidth /
-        gridItems[0].offsetWidth
-    );
-
-    switch (e.key) {
-      case "ArrowRight":
-        e.preventDefault();
-        if (currentFocusIndex === -1) {
-          focusGridItem(0);
-        } else {
-          focusGridItem(currentFocusIndex + 1);
-        }
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        if (currentFocusIndex > 0) {
-          focusGridItem(currentFocusIndex - 1);
-        }
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        if (currentFocusIndex === -1) {
-          focusGridItem(0);
-        } else {
-          focusGridItem(currentFocusIndex + itemsPerRow);
-        }
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        if (currentFocusIndex >= itemsPerRow) {
-          focusGridItem(currentFocusIndex - itemsPerRow);
-        }
-        break;
-      case "Enter":
-        if (currentFocusIndex !== -1) {
-          const link = gridItems[currentFocusIndex].querySelector("a");
-          if (link) link.click();
-        }
-        break;
-    }
+  if (!suggestionsAdded) {
+    container.innerHTML = "<p>No matches found</p>";
+  }
+};
+const createSuggestion = (container, textContent, artistId) => {
+  const button = document.createElement("button");
+  button.textContent = textContent;
+  button.className = "suggestion-button";
+  button.addEventListener("click", () => {
+    window.location.href = `/details/${artistId}`;
   });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const loadingScreen = document.getElementById("loading-screen");
-  const container = document.querySelector(".container");
-  // Simulate loading time (you can adjust this based on your actual data fetching)
-  setTimeout(() => {
-    loadingScreen.style.opacity = "0";
-    container.style.opacity = "1";
-    setTimeout(() => {
-      loadingScreen.style.display = "none";
-    }, 500); // This matches the transition time
-  }, 2000); // Adjust this time as needed
-  initializePagination();
-  initializeKeyboardNavigation();
+  container.appendChild(button);
+};
+// Close suggestions when clicking outside
+document.addEventListener("click", function (event) {
+  const container = document.querySelector(".suggestions");
+  const searchBar = document.getElementById("search-bar");
+  if (!container.contains(event.target) && event.target !== searchBar) {
+    container.style.display = "none";
+  }
 });
 
-function filterArtists() {
-  const searchInput = document.getElementById("searchInput");
-  const filter = searchInput.value.toLowerCase();
-  const artistCards = document.querySelectorAll(".card-grid");
-
-  artistCards.forEach((card) => {
-    const artistName = card.getAttribute("data-name").toLowerCase();
-    if (artistName.includes(filter)) {
-      card.style.display = "";
-    } else {
-      card.style.display = "none";
-    }
-  });
+// Toggle filter menu visibility
+function toggleFilters() {
+  document.getElementById("filterMenu").classList.toggle("active");
 }
 
+// Close filters when clicking outside
+document.addEventListener("click", (event) => {
+  const filterMenu = document.getElementById("filterMenu");
+  const filterButton = event.target.closest(".filter-button");
+  const filterMenuElement = event.target.closest(".filter-menu");
+
+  if (
+    !filterButton &&
+    !filterMenuElement &&
+    filterMenu.classList.contains("active")
+  ) {
+    filterMenu.classList.remove("active");
+  }
+});
+
+// Add this to your initialization
 document.addEventListener("DOMContentLoaded", () => {
-  const artistCards = document.querySelectorAll(".card-grid");
-  artistCards.forEach((card) => {
-    card.style.display = "";
+  initializeArtists();
+  populateYearFilter();
+});
+
+
+function setupRangeInputs(startInput, endInput, startDisplay, endDisplay) {
+  function updateRanges() {
+      let startVal = parseInt(startInput.value);
+      let endVal = parseInt(endInput.value);
+
+      // Ensure end value is always greater than start value
+      if (startVal >= endVal) {
+          if (this === startInput) {
+              endInput.value = Math.min(parseInt(startVal) + 1, endInput.max);
+              endVal = parseInt(endInput.value);
+          } else {
+              startInput.value = Math.max(parseInt(endVal) - 1, startInput.min);
+              startVal = parseInt(startInput.value);
+          }
+      }
+
+      // Update displays
+      startDisplay.textContent = startVal;
+      endDisplay.textContent = endVal;
+  }
+
+  startInput.addEventListener('input', updateRanges);
+  endInput.addEventListener('input', updateRanges);
+}
+
+// Setup Creation Date Range
+setupRangeInputs(
+  document.querySelector('input[name="creationDateStart"]'),
+  document.querySelector('input[name="creationDateEnd"]'),
+  document.getElementById('creationDateStartValue'),
+  document.getElementById('creationDateEndValue')
+);
+
+// Setup First Album Range
+setupRangeInputs(
+  document.querySelector('input[name="firstAlbumStart"]'),
+  document.querySelector('input[name="firstAlbumEnd"]'),
+  document.getElementById('firstAlbumStartValue'),
+  document.getElementById('firstAlbumEndValue')
+);
+
+
+// Function to update range display values
+function updateRangeDisplays() {
+  document.getElementById('creationDateStartValue').textContent = document.querySelector('input[name="creationDateStart"]').value;
+  document.getElementById('creationDateEndValue').textContent = document.querySelector('input[name="creationDateEnd"]').value;
+  document.getElementById('firstAlbumStartValue').textContent = document.querySelector('input[name="firstAlbumStart"]').value;
+  document.getElementById('firstAlbumEndValue').textContent = document.querySelector('input[name="firstAlbumEnd"]').value;
+}
+
+// Function to reset all filters
+function resetFilters(event) {
+  // Prevent form submission
+  event.preventDefault();
+  
+  // Get the form element
+  const form = document.getElementById('filterMenu');
+  
+  // Reset range inputs to default values
+  form.querySelector('input[name="creationDateStart"]').value = "1950";
+  form.querySelector('input[name="creationDateEnd"]').value = "2024";
+  form.querySelector('input[name="firstAlbumStart"]').value = "1950";
+  form.querySelector('input[name="firstAlbumEnd"]').value = "2024";
+  
+  // Reset all checkboxes
+  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = false;
   });
+  
+  // Reset location input
+  form.querySelector('input[name="location"]').value = "";
+  
+  // Update the display values for ranges
+  updateRangeDisplays();
+}
+
+// Add event listeners for range inputs to update displays
+document.addEventListener('DOMContentLoaded', function() {
+  const rangeInputs = document.querySelectorAll('input[type="range"]');
+  rangeInputs.forEach(input => {
+    input.addEventListener('input', updateRangeDisplays);
+  });
+  
+  // Initial update of range displays
+  updateRangeDisplays();
+  
+  // Add event listener to reset button
+  const resetButton = document.querySelector('.reset-filters');
+  resetButton.addEventListener('click', resetFilters);
 });
