@@ -3,11 +3,12 @@ package database
 import (
 	"database/sql"
 
+	"github.com/gofrs/uuid/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID           int
+	UUID         string
 	Username     string
 	Email        string
 	PasswordHash string
@@ -27,13 +28,12 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (ur *UserRepository) CreateUsersTable() error {
 	query := `
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uuid TEXT UNIQUE NOT NULL,
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
         fullname TEXT NOT NULL
     )`
-
 	_, err := ur.DB.Exec(query)
 	return err
 }
@@ -46,36 +46,37 @@ func (ur *UserRepository) UserExists(username, email string) (bool, error) {
 }
 
 func (ur *UserRepository) CreateUser(user *User) error {
+	// Generate a new UUID for the user
+	newUUID, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
 	query := `
-    INSERT INTO users (username, email, password_hash, fullname)
-    VALUES (?, ?, ?, ?)`
+    INSERT INTO users (uuid, username, email, password_hash, fullname)
+    VALUES (?, ?, ?, ?, ?)`
 
-	result, err := ur.DB.Exec(query, user.Username, user.Email, string(hashedPassword), user.Fullname)
+	_, err = ur.DB.Exec(query, newUUID.String(), user.Username, user.Email, string(hashedPassword), user.Fullname)
 	if err != nil {
 		return err
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
-
-	user.ID = int(id)
+	user.UUID = newUUID.String()
 	return nil
 }
 
 // getUserByUsername retrieves a user from the database by username
 func (ur *UserRepository) GetUserByUsername(username string) (*User, error) {
 	user := &User{}
-	query := "SELECT id, username, email, password_hash, fullname FROM users WHERE username = ?"
+	query := "SELECT uuid, username, email, password_hash, fullname FROM users WHERE username = ?"
 
 	err := ur.DB.QueryRow(query, username).Scan(
-		&user.ID,
+		&user.UUID,
 		&user.Username,
 		&user.Email,
 		&user.PasswordHash,
