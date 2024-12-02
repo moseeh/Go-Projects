@@ -1,7 +1,10 @@
 package database
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -94,4 +97,21 @@ func (ur *UserRepository) GetUserByUsername(username string) (*User, error) {
 	}
 
 	return user, nil
+}
+
+func (ur *UserRepository) AddSession(username string) error {
+	sessionID := generateSessionID()
+	sessionExpiresAt := time.Now().Add(30 * time.Minute)
+	_, err := ur.DB.Exec(
+		"UPDATE users SET session_id = ?, session_expires_at = ? WHERE username = ?",
+		sessionID, sessionExpiresAt, username,
+	)
+	return err
+}
+
+// generateSessionID creates a random session ID.
+func generateSessionID() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+	return hex.EncodeToString(b)
 }
