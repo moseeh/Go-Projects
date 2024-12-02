@@ -59,6 +59,10 @@ func (h *Login) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 			return
 		}
+		err = h.UserRepo.AddSession(username)
+		if err != nil {
+			http.Error(w, "failed to update session", http.StatusInternalServerError)
+		}
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
