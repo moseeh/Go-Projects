@@ -32,7 +32,9 @@ func (ur *UserRepository) CreateUsersTable() error {
         username TEXT UNIQUE NOT NULL,
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
-        fullname TEXT NOT NULL
+        fullname TEXT NOT NULL,
+		session_id TEXT,
+        session_expires_at DATETIME
     )`
 	_, err := ur.DB.Exec(query)
 	return err
