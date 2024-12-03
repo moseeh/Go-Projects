@@ -3,16 +3,29 @@ package client
 import (
 	"bufio"
 	"net"
+	"net-cat/models"
 	"strings"
 )
 
 func GetClientName(conn net.Conn) (string, error) {
-	conn.Write([]byte("[ENTER YOUR NAME]: "))
-	// Read the client's name from the connection
-	reader := bufio.NewReader(conn)
-	name, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
+
+	for {
+		conn.Write([]byte("[ENTER YOUR NAME]: "))
+		reader := bufio.NewReader(conn)
+
+		name, err := reader.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+		name = strings.TrimSpace(name)
+		models.ClientsMutex.Lock()
+		_, exists := models.Clients[name]
+		models.ClientsMutex.Unlock()
+
+		if !exists {
+			return name, nil
+		}
+		conn.Write([]byte("name already taken....try again.\n"))
+
 	}
-	return strings.TrimSpace(name), nil
 }
