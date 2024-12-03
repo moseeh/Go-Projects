@@ -11,19 +11,8 @@ var (
 	ClientsMutex   sync.Mutex
 )
 
-type Client struct {
-	Conn     net.Conn
-	Username string
-	Messages chan string
-}
-
 type Server struct {
-	Messages Message
 	Prevchat []string
 	Mutex    sync.Mutex
-}
-
-type Message struct {
-	Text       string
-	Senderconn net.Conn
+	Logo     []byte
 }
