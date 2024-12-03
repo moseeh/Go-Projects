@@ -6,7 +6,6 @@ import (
 	"io"
 	"net"
 	"strings"
-	"sync"
 	"time"
 
 	"net-cat/client"
@@ -14,13 +13,12 @@ import (
 	"net-cat/utils"
 )
 
-type newServer struct {
+type NewServer struct {
 	models.Server
-	mu sync.Mutex // Mutex to ensure thread-safe access to Prevchat
 }
 
 func Server(addr string) {
-	server := newServer{
+	server := NewServer{
 		Server: models.Server{
 			Prevchat: make([]string, 0),
 		},
@@ -28,12 +26,10 @@ func Server(addr string) {
 
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		fmt.Println("Error starting server:", err)
+		fmt.Println("Error listening:", err)
 		return
 	}
-	defer listener.Close()
-
-	fmt.Printf("Listening on port %s...\n", addr)
+	fmt.Printf("Server listening on port %s...\n", addr)
 
 	for {
 		conn, err := listener.Accept()
@@ -42,99 +38,93 @@ func Server(addr string) {
 			continue
 		}
 
-		go server.handleConnection(conn)
+		fmt.Println("New connection from", conn.RemoteAddr())
+
+		go server.HandleConnection(conn)
 	}
 }
 
-func (s *newServer) handleConnection(conn net.Conn) {
+func (s *NewServer) HandleConnection(conn net.Conn) {
 	defer conn.Close()
+	s.Mutex.Lock()
 
-	// Check if the chat is full
-	models.ClientsMutex.Lock()
 	if len(models.Clients) >= models.MaxConnections {
-		models.ClientsMutex.Unlock()
-		conn.Write([]byte("Chat room is full, try again later.\n"))
+		conn.Write([]byte("Error: Maximum number of connections reached. Please try again later.\n"))
+		conn.Close()
+		s.Mutex.Unlock()
 		return
 	}
-	models.ClientsMutex.Unlock()
 
-	fmt.Println("New connection from", conn.RemoteAddr())
+	s.Mutex.Unlock()
+	s.Logo = utils.ReadLogo()
+	conn.Write(s.Logo)
 
-	// Send welcome logo
-	conn.Write(utils.ReadLogo())
-
-	// Get client name and validate uniqueness
-	var name string
-	for {
-		tempName, err := client.GetClientName(conn)
-		if err != nil {
-			fmt.Println("Error getting client name:", err)
-			conn.Write([]byte("Failed to retrieve your name. Disconnecting.\n"))
-			return
-		}
-
-		if err := client.AddClient(tempName, conn); err != nil {
-			conn.Write([]byte("Name already in use. Please choose a different name:\n"))
-		} else {
-			name = tempName
-			break
-		}
+	name, err := client.GetClientName(conn)
+	if err != nil {
+		fmt.Println("Error getting client name:", err)
+		conn.Write([]byte("Error: Could not get your name. Please try again.\n"))
+		conn.Close()
+		return
 	}
 
-	// Send previous chat history
-	s.mu.Lock()
-	for _, v := range s.Prevchat {
-		conn.Write([]byte(v + "\n"))
-	}
-	s.mu.Unlock()
+	client.AddClient(name, conn)
 
-	fmt.Printf("%s has joined the chat.\n", name)
 	defer client.RemoveClient(name)
 
-	// Handle messages from the client
-	s.handleMessages(name, conn)
+	s.SendPreviousChats(conn)
+
+	s.HandleMessages(name, conn)
 }
 
-func (s *newServer) handleMessages(name string, conn net.Conn) {
-	reader := bufio.NewReader(conn)
+func (s *NewServer) SendPreviousChats(conn net.Conn) {
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 
+	if len(s.Prevchat) > 0 {
+		for _, msg := range s.Prevchat {
+			conn.Write([]byte(msg))
+		}
+	}
+}
+
+func (s *NewServer) HandleMessages(name string, conn net.Conn) {
+	reader := bufio.NewReader(conn)
 	for {
 		msg, err := reader.ReadString('\n')
 		if err != nil {
 			if err != io.EOF {
-				fmt.Printf("Error reading message from %s: %v\n", name, err)
+				fmt.Println("Error reading message:", err)
 			}
-			fmt.Printf("%s has left the chat.\n", name)
 			return
 		}
 
-		msg = strings.TrimSpace(msg)
-		if msg == "" {
+		if strings.TrimSpace(msg) == "" {
+			timestamp := time.Now().Format("2006-01-02 15:04:05")
+
+			formattedMsg := fmt.Sprintf("[%s][%s]:%s", timestamp, name, msg)
+			fmt.Fprint(conn, "\033[F\033[K")
+			fmt.Fprint(conn, formattedMsg)
 			continue
 		}
 
-		// Format the message with timestamp
-		timestamp := time.Now().Format("2006-01-02 15:04:05")
-		formattedMsg := fmt.Sprintf("[%s][%s]: %s", timestamp, name, msg)
-
-		// Append the message to the chat history
-		s.mu.Lock()
-		s.Prevchat = append(s.Prevchat, formattedMsg)
-		s.mu.Unlock()
-
-		// Broadcast the message
-		broadcastMessage(formattedMsg)
+		s.BroadcastMessage(name, msg)
 	}
 }
 
-func broadcastMessage(msg string) {
-	models.ClientsMutex.Lock()
-	defer models.ClientsMutex.Unlock()
+func (s *NewServer) BroadcastMessage(name, msg string) {
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
-	for name, c := range models.Clients {
-		_, err := fmt.Fprintln(c, msg)
-		if err != nil {
-			fmt.Printf("Error sending message to %s: %v\n", name, err)
+	formattedMsg := fmt.Sprintf("[%s][%s]:%s", timestamp, name, msg)
+
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
+
+	s.Prevchat = append(s.Prevchat, formattedMsg)
+
+	for n, c := range models.Clients {
+		if n == name {
+			fmt.Fprint(c, "\033[F\033[K")
 		}
+		fmt.Fprint(c, formattedMsg)
 	}
 }
