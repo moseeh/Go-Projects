@@ -18,6 +18,6 @@ func main() {
 		return
 	}
 	paths := utils.FindPaths(Antcolony)
-	fmt.Println(paths)
-	fmt.Println(utils.FilterPaths(paths, Antcolony))
+	paths, antsPerPath := utils.FilterPaths(paths, Antcolony)
+	utils.PrintTurns(paths, antsPerPath, Antcolony.NumberOfAnts)
 }
